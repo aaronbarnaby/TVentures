@@ -1,0 +1,13 @@
+choiceData:
+	TEXT
+	COLOR
+		- red
+	REQUIRED_TYPE
+		- power
+		- intellect
+		- karma
+		-love
+	REQUIRED_QTY
+	ACTION
+		- next
+	NEXT

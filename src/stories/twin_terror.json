@@ -1,0 +1,40 @@
+[
+    {
+        "KEY": "TTE1",
+        "TEXT": "Well If you not even going to enter the house we will just end here.\n\nTHE END.",
+        "ONENTER": "END"
+    },
+    {
+        "KEY": "TTE2",
+        "TEXT": "Seems like this story isn't finished.\n\nTHE END.",
+        "ONENTER": "END"
+    },
+    {
+        "KEY": "TT0",
+        "TEXT": "You wake up and find yourself in the pitch black, after pushing yourself to your feet you notice a porch light in the distance.\n\nAs you walk up to the house you notice that all the curtains are closed and you have no way to tell if anyone is home, however the front door is slightly open.",
+        "CHOICES": [
+            { 
+                "TEXT": "Enter House",
+                "ACTION": "next",
+                "NEXT": "TT1"
+            },
+            {
+                "TEXT": "Leave",
+                "COLOR": "red",
+                "ACTION": "next",
+                "NEXT": "TTE1"
+            }
+        ]
+    },
+    {
+        "KEY": "TT1",
+        "TEXT": "You Open the door and walk inside.",
+        "CHOICES": [
+            { 
+                "TEXT": "Continue",
+                "ACTION": "next",
+                "NEXT": "TTE2"
+            }
+        ]
+    }
+]
