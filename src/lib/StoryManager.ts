@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import Sliders from '../interfaces/sliders';
+import StoryNode from '../interfaces/storyNode';
 
 var mainFont = '500 12.5pt Fira Sans';
 var mainFontColor = '#FFBD29';
@@ -11,43 +12,46 @@ var fontColorKarma = '#12B516';
 var fontColorIntellect = '#00B0FF';
 var fontColorLove = '#FC32DA';
 
+var choicesSpacer = 15;
+
 export default class StoryManager {
     
-    game: any;
+    game: Phaser.Game;
     
     // UI
-    uiText: any;
-    uiFrames: any;
+    uiText: any = {};
+    uiFrames: any = {};
     uiSliders: Sliders;
-    uiMasks: any;
+    uiMasks: any = {};
     
     textStyle: any;
     choicesStyle: any;
     
     // Player
-    character: any;
+    character: any = {};
     
     // Story
-    storyData: any;
+    storyData: [StoryNode];
     
     storyText: Phaser.Text;
     
     battle: any;
     
     choicesGroup: Phaser.Group;
-    choices: any;
     choicesHeight: number;
-    loadedChoices: any;
+    choices: any = [];
+    loadedChoices: any = [];
     
-    constructor(gameRef: Phaser.Game, startingNode: string) {
+    constructor(gameRef: Phaser.Game, storyData: any, startingNode: string) {
         this.choicesHeight = 100; // Default Height
         this.game = gameRef;
+        this.storyData = storyData;
 
-        this.setupTextStyles();
         this.setupFrames();
         this.setupSliders();
         this.setupMasks();
 
+        this.setupTextStyles();
         this.setupText(startingNode);
         this.fadeInText();
 
@@ -61,7 +65,7 @@ export default class StoryManager {
         // Add Method to Access Save Instance
         //STORY.currentSaveGame.writeToGameLog(STORY.currentSaveGame.currentNodeKey, choiceNumber);
 
-        var choiceData = this.loadedChoices[choiceNumber];
+        var choiceData = this.loadedChoices[choiceNumber].data;
 
         if (choiceData.ACTION === 'next') {
             var nextNode = choiceData.NEXT;
@@ -81,9 +85,7 @@ export default class StoryManager {
                     this.fadeInText();
 
                     // Clear ALL Text
-                    _.forEach(this.choices, (c) => {
-                        c.setText('');
-                    });
+                    this.resetChoices();
                     
                     // Add Method to Access Save Instance
                     // STORY.currentSaveGame.currentNodeKey = 'TT0'; // Reset Story
@@ -106,6 +108,10 @@ export default class StoryManager {
     
     setupText(nodeKey) {
         var nodeData = _.find(this.storyData, o => o.KEY === nodeKey);
+        if (!nodeData) {
+            return alert('Unable to find Node Data');
+        }
+
         this.storyText = this.game.add.text(this.uiFrames.top.x, this.uiFrames.top.y, nodeData.TEXT, this.textStyle);
         this.storyText.mask = this.uiMasks.storyText;
     }
@@ -123,7 +129,7 @@ export default class StoryManager {
             height: Math.round(this.game.height * 0.275 - 5),
             x: this.uiFrames.top.x
         };
-        this.uiFrames.bold.y = Math.round(((this.game.height - this.uiFrames.top.y - this.uiFrames.top.height - this.uiFrames.bottom.height) / 2) + this.uiFrames.top.y + this.uiFrames.top.height);
+        this.uiFrames.bottom.y = Math.round(((this.game.height - this.uiFrames.top.y - this.uiFrames.top.height - this.uiFrames.bottom.height) / 2) + this.uiFrames.top.y + this.uiFrames.top.height);
     }
     
     setupSliders() {
@@ -131,12 +137,12 @@ export default class StoryManager {
             top: this.game.add.sprite(this.game.width - this.uiFrames.top.x, this.uiFrames.top.y, 'slider01'),
             top_back: this.game.add.sprite(this.game.width - this.uiFrames.top.x, this.uiFrames.top.y, 'slider01_back'),
             bottom: this.game.add.sprite(this.game.width - this.uiFrames.bottom.x, this.uiFrames.bottom.y, 'slider01'),
-            bottom_back: this.game.sprite(this.game.width - this.uiFrames.bottom.x, this.uiFrames.bottom.y, 'slider02_back')
+            bottom_back: this.game.add.sprite(this.game.width - this.uiFrames.bottom.x, this.uiFrames.bottom.y, 'slider02_back')
         };
         
         this.uiSliders.top.frame = 0;
         this.uiSliders.top.inputEnabled = true;
-        this.uiSliders.top.input.enableDrag({ boundsSprite: this.uiSliders.top_back });
+        this.uiSliders.top.input.enableDrag(null, null, null, null, null, this.uiSliders.top_back);
         this.uiSliders.top.input.boundsSprite = this.uiSliders.top_back;
         this.uiSliders.top.input.dragFromCenter = false;
         this.uiSliders.top.input.allowHorizontalDrag = false;
@@ -147,7 +153,7 @@ export default class StoryManager {
         
         this.uiSliders.bottom.frame = 0;
         this.uiSliders.bottom.inputEnabled = true;
-        this.uiSliders.bottom.input.enableDrag({ boundsSprite: this.uiSliders.bottom_back });
+        this.uiSliders.bottom.input.enableDrag(null, null, null, null, null, this.uiSliders.bottom_back);
         this.uiSliders.bottom.input.boundsSprite = this.uiSliders.bottom_back;
         this.uiSliders.bottom.input.dragFromCenter = false;
         this.uiSliders.bottom.input.allowHorizontalDrag = false;
@@ -171,7 +177,6 @@ export default class StoryManager {
     setupChoices() {
         this.choicesGroup = this.game.add.group();
         
-        var choicesSpacer = 15;
         var currentHeight = 0;
         for (let i = 0; i < 5; i++) {
             var yPos = this.uiFrames.bottom.y + currentHeight + (choicesSpacer * i);
@@ -179,10 +184,10 @@ export default class StoryManager {
             this.choices[i] = this.game.add.text(this.uiFrames.bottom.x, yPos, `Choice ${i}`, this.choicesStyle, this.choicesGroup)
             this.choices[i].inputEnabled = true;
             this.choices[i].input.useHandCursor = true;
-            this.choices[i].events.onInputOver.add(this.choiceOver, this, 0, i);
-            this.choices[i].events.onInputOut.add(this.choiceOut, this, 0, i);
-            this.choices[i].events.onInputDown.add(this.choiceDown, this, 0, i);
-            this.choices[i].events.onInputUp.add(this.choiceUp, this, 0, i);
+            this.choices[i].events.onInputOver.add(this.choiceOver, this, 0);
+            this.choices[i].events.onInputOut.add(() => this.choiceOut(this.choices[i], i), this, 0);
+            this.choices[i].events.onInputDown.add(this.choiceDown, this, 0);
+            this.choices[i].events.onInputUp.add(() => this.choiceUp(this.choices[i], i), this, 0);
 
             currentHeight += this.choices[i].height;
         }
@@ -249,8 +254,6 @@ export default class StoryManager {
     }
 
     loadChoices(nodeKey) {
-        var choicesSpacer = 15;
-
         this.resetChoices();
         
         var nodeData = _.find(this.storyData, o => o.KEY === nodeKey);
@@ -261,8 +264,10 @@ export default class StoryManager {
                 if (this.checkChoiceDisplay(i)) {
                     this.choices[index].setText(i.TEXT);
                     this.choices[index].y = this.uiFrames.bottom.y + this.choicesHeight;
+                    // this.choices[index].y = this.uiFrames.bottom.y + this.choicesHeight + (choicesSpacer * index);
                     this.choices[index].fill = this.checkChoiceColor(i);
                     this.choicesHeight += this.choices[index].height + ((index !== 0) ? choicesSpacer : 0);
+                    // this.choicesHeight += this.choices[index].height + (choicesSpacer * index);
 
                     this.loadedChoices[index] = {
                         color: this.choices[index].fill,

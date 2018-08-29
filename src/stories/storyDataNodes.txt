@@ -1,3 +1,9 @@
+storyData:
+	KEY
+	TEXT
+	ONENTER
+	CHOICES: [choiceData]
+
 choiceData:
 	TEXT
 	COLOR

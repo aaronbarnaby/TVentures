@@ -1,12 +1,12 @@
 
 export default interface Sliders {
 
-    top: any;
+    top: Phaser.Sprite;
 
-    top_back: any;
+    top_back: Phaser.Sprite;
 
-    bottom: any;
+    bottom: Phaser.Sprite;
 
-    bottom_back: any;
+    bottom_back: Phaser.Sprite;
 
 }

@@ -15,7 +15,7 @@ export default class StoryState extends Phaser.State {
         this.setupIcons();
         this.fadeInScreen();
 
-        this.storyManager = new StoryManager(this.game, STORY.currentSaveGame.currentNodeKey);
+        this.storyManager = new StoryManager(this.game, STORY.storyData, STORY.currentSaveGame.currentNodeKey);
     }
     
     setupBackground() {
@@ -34,7 +34,7 @@ export default class StoryState extends Phaser.State {
     setupIcons() {
         var iconXoffset = this.game.width * 0.0625;
         
-        var iconSaveButton = this.game.add.button(this.game.width - iconXoffset, this.game.height * 0.8267, 'icons', this.iconSave, this, 4, 3, 5);
+        var iconSaveButton = this.game.add.button(this.game.width - iconXoffset, this.game.height * 0.05, 'icons', this.iconSave, this, 4, 3, 5);
         iconSaveButton.anchor.setTo(0.5, 0.5);
         iconSaveButton.frame = 3;
         iconSaveButton.input.useHandCursor = true;

@@ -1,5 +1,8 @@
 
 export default class MenuState extends Phaser.State {
+
+    music: any;
+
     create() {
         this.game.stage.backgroundColor = '#000000';
         
@@ -51,9 +54,14 @@ export default class MenuState extends Phaser.State {
         blackFadeTween.onComplete.add(function () {
             blackFade.destroy();
         });
+
+        this.music = this.add.audio('melody', 0.1, true);
+        this.music.play();
     }
 
     newGameStart() {
+        this.music.stop();
+
         // Start New Game
         this.game.state.start('StoryLoading');
     }

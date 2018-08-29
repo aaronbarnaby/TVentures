@@ -1,5 +1,6 @@
 import SaveGame from "./lib/SaveGame";
 import TextManager from "./lib/TextManager";
+import IStory from "./interfaces/story";
 
 export let ASSETS = {
   "loadingBar": "./assets/images/loader-bar.png",
@@ -16,7 +17,8 @@ export let ASSETS = {
   "slider01": "./assets/images/slider01_sprite.png",
   "slider01_back": "./assets/images/slider01_back.png",
   "slider02_back": "./assets/images/slider02_back.png",
-  "rectangle_black": "./assets/images/primitive_rectangle_black.png"
+  "rectangle_black": "./assets/images/primitive_rectangle_black.png",
+  "dice": "./assets/images/dice.png"
 };
 
 export let STORYBOOKS = {
@@ -34,9 +36,9 @@ export let CONFIG = {
   webfonts: ['Fira Sans:500']
 };
 
-export let STORY = {
+export let STORY: IStory = {
   LoadedFlag: false,
-  storyData: [],
+  storyData: null,
   currentSaveGame: new SaveGame(),
   mainTextManager: new TextManager()
 }

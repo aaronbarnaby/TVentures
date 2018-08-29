@@ -29,7 +29,7 @@ export default class SplashState extends Phaser.State {
         /// Load Assets
         this.load.image("loaderBg", ASSETS.loaderBg);
         this.load.image("loaderBar", ASSETS.loadingBar);
-        this.load.audio('melody', [ASSETS.melody]);
+        this.load.audio('melody', ASSETS.melody, true);
 
         this.load.image('menu_bg01', ASSETS.menuBg01);
         this.load.image('menu_bg_circle01', ASSETS.menuBgCircle01);
