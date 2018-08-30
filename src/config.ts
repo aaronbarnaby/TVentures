@@ -1,6 +1,3 @@
-import SaveGame from "./lib/SaveGame";
-import TextManager from "./lib/TextManager";
-import IStory from "./interfaces/story";
 
 export let ASSETS = {
   "loadingBar": "./assets/images/loader-bar.png",
@@ -21,9 +18,13 @@ export let ASSETS = {
   "dice": "./assets/images/dice.png"
 };
 
-export let STORYBOOKS = {
-  TWIN_TERROR: 1, // TT
-}
+export let STORYBOOKS = [
+  {
+    Key: "TWIN_TERROR",
+    Name: "Twin Terror",
+    StartingNode: "TT0"
+  }
+];
 
 export let CONFIG = {
   gameWidth: 800,
@@ -35,10 +36,3 @@ export let CONFIG = {
   debugMode: false,
   webfonts: ['Fira Sans:500']
 };
-
-export let STORY: IStory = {
-  LoadedFlag: false,
-  storyData: null,
-  currentSaveGame: new SaveGame(),
-  mainTextManager: new TextManager()
-}

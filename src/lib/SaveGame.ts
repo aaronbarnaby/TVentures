@@ -1,45 +1,47 @@
-import { CONFIG, STORYBOOKS } from "../config";
+import * as _ from 'lodash';
+import { STORYBOOKS } from "../config";
 
 export default class SaveGame {
     
-    playerPower: number;
-    playerKarma: number;
-    playerIntellect: number;
-    playerLove: number;
-    
     currentStory: any;
     currentNodeKey: any;
+    currentCharacter: any;
     
     gameLog: any;
     gameVariables: any;
-    
-    constructor() {
-        this.playerPower = 0;
-        this.playerKarma = 0;
-        this.playerIntellect = 0;
-        this.playerLove = 0;
-        
-        if (CONFIG.debugMode) {
-            this.playerPower = 1000;
-            this.playerKarma = 1000;
-            this.playerIntellect = 1000;
-            this.playerLove = 1000;
-        }
 
-        this.currentStory = STORYBOOKS.TWIN_TERROR;
-        this.currentNodeKey = 'TT0';
-        
+    loadNew(storyKey: string) {
+        let storyData = _.find(STORYBOOKS, i => i.Key === storyKey);
+
+        this.currentStory = storyKey;
+        this.currentNodeKey = storyData.StartingNode;
+        this.currentCharacter = null;
+
         this.gameLog = [];
-        
-        this.gameVariables = {};
+        this.gameVariables = [];
     }
 
-    loadSave(story, nodeKey, power, karma, intelect, love) {
-        // @TODO
+    reload(data: any) {
+        this.currentStory = data.story;
+        this.currentNodeKey = data.node;
+        this.currentCharacter = data.character;
+        this.gameLog = data.gameLog;
+        this.gameVariables = data.gameVariables;
+    }
+
+    exportData() {
+        let saveExport = {
+            story: this.currentStory,
+            node: this.currentNodeKey,
+            character: this.currentCharacter,
+            gameLog: this.gameLog,
+            gameVariables: this.gameVariables
+        };
+        return saveExport;
     }
     
-    writeToGameLog(textNodeKey, decision) {
-        this.gameLog.push({ textNodeKey, decision });
+    writeToGameLog(decision) {
+        this.gameLog.push({ textNodeKey: this.currentNodeKey, decision });
     }
     
     writeToGameVariables(reference, value) {

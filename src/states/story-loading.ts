@@ -1,4 +1,4 @@
-import { STORY } from "../config";
+import { Globals } from "../globals";
 
 var timeOut;
 
@@ -16,16 +16,16 @@ export default class StoryLoadingState extends Phaser.State {
         timeOut = this.time.events.add(Phaser.Timer.SECOND * 20, this.loadingTimeOut, this);
         
         // Load Story
-        STORY.mainTextManager.loadStory(STORY.currentSaveGame.currentStory);
+        Globals.activeStory.textManager.loadStory(Globals.save.currentStory);
     }
     
     create() {}
     
     update() {
         // Wait for JSON data to finish loading
-        if (STORY.LoadedFlag) {
+        if (Globals.activeStory.LoadedFlag) {
             this.time.events.remove(timeOut);
-            STORY.LoadedFlag = false;
+            Globals.activeStory.LoadedFlag = false;
             this.state.start('Story');
         }
     }

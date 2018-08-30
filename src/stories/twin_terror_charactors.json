@@ -1,0 +1,71 @@
+[
+    {
+        "KEY": "parent",
+        "NAME": "The Parent",
+        "DESCRIPTION": "Your a parent that much you know but you have no idea where your children are.",
+        "ASSET": "",
+        "STATS": {
+            "power": 2,
+            "intellect": 3,
+            "karma": 1,
+            "love": 7
+        },
+        "ABILITIES": [
+            { 
+                "KEY": "sing",
+                "NAME": "Sing",
+                "DESCRIPTION": "Sing a lullaby (love + 3)",
+                "BOOST": [
+                    { "stat": "love", "amount": "+3" }
+                ],
+                "COOLDOWN": 3
+            }
+        ]
+    },
+    {
+        "KEY": "stranger",
+        "NAME": "The Stanger",
+        "DESCRIPTION": "Just some random guy",
+        "ASSET": "",
+        "STATS": {
+            "power": 5,
+            "intellect": 1,
+            "karma": 1,
+            "love": 2
+        },
+        "ABILITIES": [
+            {
+                "KEY": "uppercut",
+                "NAME": "Upper Cut Punch",
+                "DESCRIPTION": "Attack the target with a strong upper cut punch.",
+                "ACTION": [
+                    { "type": "attack", "amount": "+3" }
+                ],
+                "COOLDOWN": 2
+            }
+        ]
+    },
+    {
+        "KEY": "doctor",
+        "NAME": "The Doctor",
+        "DESCRIPTION": "Medical specialist, top in class and know to always find a logical path",
+        "ASSET": "",
+        "STATS": {
+            "power": 2,
+            "intellect": 7,
+            "karma": 1,
+            "love": 1
+        },
+        "ABILITIES": [
+            {
+                "KEY": "heal",
+                "NAME": "Heal",
+                "DESCRIPTION": "Bandgage up, healing cuts and wounds",
+                "ACTION": [
+                    { "type": "heal", "amount": "+5" }
+                ],
+                "COOLDOWN": 2
+            }
+        ]
+    }
+]

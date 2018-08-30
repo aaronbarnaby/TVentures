@@ -12,7 +12,7 @@ choiceData:
 		- power
 		- intellect
 		- karma
-		-love
+		- love
 	REQUIRED_QTY
 	ACTION
 		- next

@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import Sliders from '../interfaces/sliders';
 import StoryNode from '../interfaces/storyNode';
+import { Globals } from '../globals';
 
 var mainFont = '500 12.5pt Fira Sans';
 var mainFontColor = '#FFBD29';
@@ -42,28 +43,28 @@ export default class StoryManager {
     choices: any = [];
     loadedChoices: any = [];
     
-    constructor(gameRef: Phaser.Game, storyData: any, startingNode: string) {
+    constructor() {
         this.choicesHeight = 100; // Default Height
-        this.game = gameRef;
-        this.storyData = storyData;
+        this.game = Globals.game;
+        this.storyData = Globals.activeStory.storyData;
 
         this.setupFrames();
         this.setupSliders();
         this.setupMasks();
 
         this.setupTextStyles();
-        this.setupText(startingNode);
+        this.setupText(Globals.save.currentNodeKey);
         this.fadeInText();
 
         this.setupChoices();
-        this.loadChoices(startingNode);
+        this.loadChoices(Globals.save.currentNodeKey);
         
         this.adjustSliders();
     }
 
     makeDecision(choiceNumber) {
         // Add Method to Access Save Instance
-        //STORY.currentSaveGame.writeToGameLog(STORY.currentSaveGame.currentNodeKey, choiceNumber);
+        Globals.save.writeToGameLog(choiceNumber);
 
         var choiceData = this.loadedChoices[choiceNumber].data;
 
@@ -88,7 +89,7 @@ export default class StoryManager {
                     this.resetChoices();
                     
                     // Add Method to Access Save Instance
-                    // STORY.currentSaveGame.currentNodeKey = 'TT0'; // Reset Story
+                    Globals.save.currentNodeKey = Globals.activeStory.startingNode;
 
                     // Return To Menu
                     this.game.time.events.add(10000, () => {

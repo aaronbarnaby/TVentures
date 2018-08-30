@@ -1,14 +1,15 @@
 import StoryNode from "./storyNode";
-import SaveGame from "../lib/SaveGame";
 import TextManager from "../lib/TextManager";
 
 export default interface IStory {
     
     LoadedFlag: boolean;
 
+    startingNode: string;
+
     storyData: [StoryNode];
 
-    currentSaveGame: SaveGame;
+    charactors: [any];
 
-    mainTextManager: TextManager;
+    textManager: TextManager;
 }

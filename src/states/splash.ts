@@ -1,11 +1,12 @@
 import * as WebFont from 'webfontloader';
 
 import { ASSETS, CONFIG } from '../config';
+import { Globals } from '../globals';
 
 export default class SplashState extends Phaser.State {
-
+    
     fontsReady: boolean;
-
+    
     init() {
         this.stage.backgroundColor = '#000000';
         
@@ -29,20 +30,21 @@ export default class SplashState extends Phaser.State {
         /// Load Assets
         this.load.image("loaderBg", ASSETS.loaderBg);
         this.load.image("loaderBar", ASSETS.loadingBar);
-        this.load.audio('melody', ASSETS.melody, true);
-
         this.load.image('menu_bg01', ASSETS.menuBg01);
         this.load.image('menu_bg_circle01', ASSETS.menuBgCircle01);
         this.load.image('menu_bg_circle02', ASSETS.menuBgCircle02);
         this.load.image('menu_bg_circle03', ASSETS.menuBgCircle03);
-        this.load.spritesheet('menu01', ASSETS.menu01, 146, 26);
-        this.load.spritesheet('menu02', ASSETS.menu02, 58, 30);
-        this.load.spritesheet('icons', ASSETS.icons, 40, 40);
-        this.load.spritesheet('slider01', ASSETS.slider01, 13, 62);
         this.load.image('slider01_back', ASSETS.slider01_back);
         this.load.image('slider02_back', ASSETS.slider02_back);
         this.load.image('rectangle_black', ASSETS.rectangle_black);
         this.load.image('blackGradient', ASSETS.blackGradient);
+        
+        this.load.spritesheet('menu01', ASSETS.menu01, 146, 26);
+        this.load.spritesheet('menu02', ASSETS.menu02, 58, 30);
+        this.load.spritesheet('icons', ASSETS.icons, 40, 40);
+        this.load.spritesheet('slider01', ASSETS.slider01, 13, 62);
+        
+        this.load.audio('melody', ASSETS.melody, true);
     }
     
     create() {
@@ -52,6 +54,9 @@ export default class SplashState extends Phaser.State {
         loaderBar.anchor.setTo(0.5);
         
         this.load.setPreloadSprite(loaderBar);
+        
+        // Set Global `game` variable
+        Globals.game = this.game;
     }
     
     render() {
@@ -63,7 +68,7 @@ export default class SplashState extends Phaser.State {
             this.game.state.start("Menu");
         }
     }
-
+    
     initializeScaleMode() { // set game screen to scale proportionally
         // https://phaser.io/examples/v2/input/game-scale
         this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -71,7 +76,7 @@ export default class SplashState extends Phaser.State {
         this.scale.pageAlignHorizontally = true;
         this.scale.pageAlignVertically = false;
         this.scale.windowConstraints.bottom = 'visual'; // constrain to displayed screen area
-      }
+    }
     
     fontsLoaded() {
         this.fontsReady = true;

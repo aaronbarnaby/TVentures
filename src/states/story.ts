@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
-import { STORY } from "../config";
 import StoryManager from '../lib/StoryManager';
+import SaveManager from '../lib/SaveManager';
+import { Globals } from '../globals';
 
 export default class StoryState extends Phaser.State {
     
@@ -15,7 +16,7 @@ export default class StoryState extends Phaser.State {
         this.setupIcons();
         this.fadeInScreen();
 
-        this.storyManager = new StoryManager(this.game, STORY.storyData, STORY.currentSaveGame.currentNodeKey);
+        this.storyManager = new StoryManager();
     }
     
     setupBackground() {
@@ -53,9 +54,7 @@ export default class StoryState extends Phaser.State {
     }
     
     iconSave() {
-        // TODO: Save Current State
-        
-        this.game.state.start('Menu');
+        Globals.saveManager.saveGame(true);
     }
     
     update() {
