@@ -1,10 +1,15 @@
 import SaveManager from "../lib/SaveManager";
+import { Globals } from "../globals";
 
 export default class MenuState extends Phaser.State {
+    
+    saveManager: SaveManager;
     
     music: any;
     
     create() {
+        this.saveManager = new SaveManager();
+        
         this.setupBackground();
         this.setupButtons();        
         
@@ -25,21 +30,39 @@ export default class MenuState extends Phaser.State {
         });
         
         this.music = this.add.audio('melody', 0.1, true);
-        this.music.play();
+
+        if (Globals.hasSound) {
+            this.music.play();
+        }
     }
     
     newGameStart() {
         this.music.stop();
         
         // Start New Game
-        let saveManager = new SaveManager();
-        saveManager.newGame('TWIN_TERROR');
-
+        
+        this.saveManager.newGame('TWIN_TERROR');
+        
         this.game.state.start('StoryLoading');
     }
     
     loadGameStart() {
+        this.music.stop();
+        
         // Resume Game
+        this.saveManager.loadGame();
+    }
+
+    toggleSound() {
+        Globals.hasSound = !Globals.hasSound;
+
+        if (Globals.hasSound) {
+            // Enabled
+            this.music.play();
+        } else {
+            // Disabled
+            this.music.stop();
+        }
     }
     
     setupButtons() {
@@ -54,9 +77,18 @@ export default class MenuState extends Phaser.State {
         newGameButton.frame = 0;
         newGameButton.input.useHandCursor = true;
         
-        // var loadGameButton = this.game.add.button(this.game.width / 2, this.game.height * 0.6333, 'menu01', this.loadGameStart, this, 4, 3, 5);
-        // loadGameButton.anchor.setTo(0.5, 0.5);
-        // loadGameButton.frame = 3;
+        var loadGameButton = this.game.add.button(this.game.width / 2, this.game.height * 0.6333, 'menu01', this.loadGameStart, this, 4, 3, 5);
+        loadGameButton.anchor.setTo(0.5, 0.5);
+        loadGameButton.frame = 3;
+        
+        if (!this.saveManager.hasSave()) {
+            loadGameButton.visible = false;
+        }
+        
+        var iconXoffset = this.game.width * 0.0625;
+        var iconSoundButton = this.game.add.button(this.game.width - iconXoffset, this.game.height * 0.9283, 'icons', this.toggleSound, this, 7, 6, 8);
+        iconSoundButton.frame = 6;
+        iconSoundButton.anchor.setTo(0.5, 0.5);
     }
     
     setupBackground() {

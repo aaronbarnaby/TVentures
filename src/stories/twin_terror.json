@@ -1,15 +1,5 @@
 [
     {
-        "KEY": "TTE1",
-        "TEXT": "Well If you not even going to enter the house we will just end here.\n\nTHE END.",
-        "ONENTER": "END"
-    },
-    {
-        "KEY": "TTE2",
-        "TEXT": "Seems like this story isn't finished.\n\nTHE END.",
-        "ONENTER": "END"
-    },
-    {
         "KEY": "TT0",
         "TEXT": "You wake up and find yourself in the pitch black, after pushing yourself to your feet you notice a porch light in the distance.\n\nAs you walk up to the house you notice that all the curtains are closed and you have no way to tell if anyone is home, however the front door is slightly open.",
         "CHOICES": [
@@ -20,21 +10,77 @@
             },
             {
                 "TEXT": "Leave",
-                "COLOR": "red",
                 "ACTION": "next",
                 "NEXT": "TTE1"
             }
         ]
     },
     {
+        "KEY": "TTE1",
+        "TEXT": "You decide you want to part of whatever is in that house, you turn away and start the walk down the road.\n\n\n\nTHE END.",
+        "ONENTER": [{ "type": "end" }]
+    },
+    {
         "KEY": "TT1",
-        "TEXT": "You Open the door and walk inside.",
+        "TEXT": "As you enter the house you hear the sound of children playing and laughing, It seems to be coming from upstairs.\n\nAfter a short while the laughing stops and you hear a cry to the point of screaming from a girl.\n\nAs you look around the room you entered you notice the stairs directly in front of you as well as two doors, One to the left and one right.",
+        "ONENTER": [
+            { "type": "audio", "target": "kids_opening", "volume": 0.05, "loop": false }
+        ],
         "CHOICES": [
             { 
-                "TEXT": "Continue",
+                "TEXT": "Head upstairs towards the sounds that you heard.",
                 "ACTION": "next",
                 "NEXT": "TTE2"
+            },
+            { 
+                "TEXT": "Enter the door on the left",
+                "ACTION": "next",
+                "NEXT": "TTE2"
+            },
+            { 
+                "TEXT": "Enter the door on the right",
+                "ACTION": "next",
+                "NEXT": "TTE2"
+            },
+            { 
+                "TEXT": "Exit the house",
+                "ACTION": "next",
+                "NEXT": "TTD1"
             }
         ]
+    },
+    {
+        "KEY": "TTD1",
+        "TEXT": "As you turn to leave the house you hear a large thumping, faster and faster.\n\nYou dare not turn around to look so you just start running.",
+        "ONENTER": [
+            { "type": "audio", "target": "monster_roar", "volume": 0.3, "loop": false },
+            { "type": "audio", "target": "monster_coming", "volume": 0.2, "loop": false, "delay": 1000 },
+            { "type": "audio", "target": "outside_running", "volume": 0.1, "loop": false, "delay": 5000 }
+        ],
+        "NEXT": "TTD1-1"
+    },
+    {
+        "KEY": "TTD1-1",
+        "TEXT": "Before you have time to react you feel a sharp pain in your chest.\n\nYou look down and see a spike like claw that seems to have impaled you.\n\nBefore you know it you fall flat on the ground and everything goes black.\n\n\n\nGAME OVER",
+        "ONENTER": [
+            { "type": "audio", "target": "monster_growl", "volume": 0.5, "loop": false, "delay": 1000 }
+        ],
+        "CHOICES": [
+            { 
+                "TEXT": "Start Again",
+                "ACTION": "next",
+                "NEXT": "TT0"
+            },
+            {
+                "TEXT": "Return To Menu",
+                "ACTION": "redirect",
+                "TARGET": "Menu"
+            }
+        ]
+    },
+    {
+        "KEY": "TTE2",
+        "TEXT": "Seems like this story isn't finished.\n\n\n\nTHE END.",
+        "ONENTER": [{ "type": "end" }]
     }
 ]

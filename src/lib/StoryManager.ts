@@ -33,6 +33,7 @@ export default class StoryManager {
     
     // Story
     storyData: [StoryNode];
+    backgroundSounds: [any];
     
     storyText: Phaser.Text;
     
@@ -47,73 +48,100 @@ export default class StoryManager {
         this.choicesHeight = 100; // Default Height
         this.game = Globals.game;
         this.storyData = Globals.activeStory.storyData;
-
+        
         this.setupFrames();
         this.setupSliders();
         this.setupMasks();
-
-        this.setupTextStyles();
-        this.setupText(Globals.save.currentNodeKey);
-        this.fadeInText();
-
-        this.setupChoices();
-        this.loadChoices(Globals.save.currentNodeKey);
         
-        this.adjustSliders();
-    }
+        this.setupTextStyles();
+        this.setupText();
+        
+        this.setupChoices();
 
+        this.loadStoryNode(Globals.save.currentNodeKey);
+    }
+    
     makeDecision(choiceNumber) {
+        this.resetAudio(); // Stop any looping background sound from previous node
+
         // Add Method to Access Save Instance
         Globals.save.writeToGameLog(choiceNumber);
-
+        
         var choiceData = this.loadedChoices[choiceNumber].data;
-
+        
         if (choiceData.ACTION === 'next') {
             var nextNode = choiceData.NEXT;
-
+            
             this.loadStoryNode(nextNode);
+        }
+
+        if (choiceData.ACTION === 'redirect') {
+            this.game.state.start(choiceData.TARGET);
         }
     }
     
     loadStoryNode(node) {
         var data = _.find(this.storyData, o => o.KEY === node);
-
+        
         if (data) {
+            this.storyText.setText(data.TEXT);
+            this.storyText.y = this.uiFrames.top.y;
+            this.fadeInText();
+            
+            this.loadChoices(data.KEY);
+            this.adjustSliders();
+            
+            Globals.save.currentNodeKey = data.KEY;
+            
             if (typeof(data.ONENTER) !== "undefined") {
-                if (data.ONENTER === 'END') {
-                    this.storyText.setText(data.TEXT);
-                    this.storyText.y = this.uiFrames.top.y;
-                    this.fadeInText();
-
-                    // Clear ALL Text
-                    this.resetChoices();
-                    
-                    // Add Method to Access Save Instance
-                    Globals.save.currentNodeKey = Globals.activeStory.startingNode;
-
-                    // Return To Menu
-                    this.game.time.events.add(10000, () => {
-                        this.game.state.start('Menu');
-                    }, this);
-                }
+                _.forEach(data.ONENTER, (x) => {
+                    if (x.type === 'end') {
+                        // Add Method to Access Save Instance
+                        Globals.save.currentNodeKey = Globals.activeStory.startingNode;
+                        
+                        // Return To Menu
+                        this.game.time.events.add(10000, () => {
+                            this.game.state.start('Menu');
+                        }, this);
+                    } else if (x.type === 'audio') {
+                        let audioClip = this.game.add.audio(x.target, (x.volume || 1), (x.loop || false));
+                        
+                        if (Globals.hasSound) {
+                            // Check for Delayed Play
+                            if (x.delay) {
+                                this.game.time.events.add(x.delay, () => {
+                                    audioClip.play();
+                                }, this);
+                            } else {
+                                audioClip.play();
+                            }
+                        }
+                        
+                        if (this.backgroundSounds) {
+                            this.backgroundSounds.push({ sound: audioClip, loop: x.loop });
+                        } else {
+                            this.backgroundSounds = [{ sound: audioClip, loop: x.loop }];
+                        }
+                    }
+                });
             }
         } else {
             alert(`Invalid Target Node: ${node}`);
         }
     }
-    
+
+    resetAudio() {
+        this.stopAudio();
+        this.backgroundSounds = null;
+    }
+
     setupTextStyles() {
         this.textStyle = { font: mainFont, fill: mainFontColor, align: 'left', wordWrap: true, wordWrapWidth: this.uiFrames.top.width };
         this.choicesStyle = { font: 'bold 12pt Arial', fill: choiceColor, align: 'left', wordWrap: true, wordWrapWidth: this.uiFrames.bottom.width };
     }
     
-    setupText(nodeKey) {
-        var nodeData = _.find(this.storyData, o => o.KEY === nodeKey);
-        if (!nodeData) {
-            return alert('Unable to find Node Data');
-        }
-
-        this.storyText = this.game.add.text(this.uiFrames.top.x, this.uiFrames.top.y, nodeData.TEXT, this.textStyle);
+    setupText() {
+        this.storyText = this.game.add.text(this.uiFrames.top.x, this.uiFrames.top.y, "", this.textStyle);
         this.storyText.mask = this.uiMasks.storyText;
     }
     
@@ -163,7 +191,7 @@ export default class StoryManager {
         this.uiSliders.bottom.events.onInputDown.add(this.sliderDown, this);
         this.uiSliders.bottom_back.height = this.uiFrames.bottom.height;
     }
-
+    
     setupMasks() {
         this.uiMasks = {
             storyText: this.game.add.graphics(0, 0),
@@ -181,7 +209,7 @@ export default class StoryManager {
         var currentHeight = 0;
         for (let i = 0; i < 5; i++) {
             var yPos = this.uiFrames.bottom.y + currentHeight + (choicesSpacer * i);
-
+            
             this.choices[i] = this.game.add.text(this.uiFrames.bottom.x, yPos, `Choice ${i}`, this.choicesStyle, this.choicesGroup)
             this.choices[i].inputEnabled = true;
             this.choices[i].input.useHandCursor = true;
@@ -189,13 +217,13 @@ export default class StoryManager {
             this.choices[i].events.onInputOut.add(() => this.choiceOut(this.choices[i], i), this, 0);
             this.choices[i].events.onInputDown.add(this.choiceDown, this, 0);
             this.choices[i].events.onInputUp.add(() => this.choiceUp(this.choices[i], i), this, 0);
-
+            
             currentHeight += this.choices[i].height;
         }
-
+        
         this.choicesGroup.mask = this.uiMasks.choices;
     }
-
+    
     adjustSliders() {
         // Adjust slider height based on amount of text, or else hide
         this.uiSliders.top.y = this.uiFrames.top.y;
@@ -209,6 +237,7 @@ export default class StoryManager {
             this.fadeSlider(this.uiSliders.top_back, 0, 500);
             
             // Slider movement calculations
+            this.uiText.top = {};
             this.uiText.top.rightgap = this.uiSliders.top_back.height - this.uiSliders.top.height;
             this.uiText.top.distance = (this.uiText.top.rightgap / this.uiSliders.top_back.height) * this.storyText.height;
             this.uiText.top.topgap = this.uiFrames.top.y;
@@ -225,6 +254,7 @@ export default class StoryManager {
             this.fadeSlider(this.uiSliders.bottom_back, 500, 200);
             
             // Slider movement calculations
+            this.uiText.bottom = {};
             this.uiText.bottom.rightgap = this.uiSliders.bottom_back.height - this.uiSliders.bottom.height;
             this.uiText.bottom.distance = (this.uiText.bottom.rightgap / this.uiSliders.bottom_back.height) * this.choicesGroup.height;
             this.uiText.bottom.topgap = this.uiFrames.bottom.y;
@@ -234,7 +264,7 @@ export default class StoryManager {
             this.uiSliders.bottom_back.visible = false;
         }
     }
-
+    
     fadeSlider(slider, delay, duration) {
         slider.alpha = 0;
         
@@ -242,34 +272,32 @@ export default class StoryManager {
             this.game.add.tween(slider).to({ alpha: 1 }, duration, Phaser.Easing.Linear.None, true);
         }, this);
     }
-
+    
     resetChoices() {
         this.loadedChoices.length = 0;
         this.choicesGroup.y = 0;
-
+        
         _.forEach(this.choices, (c) => {
             c.setText('');
             c.fill = choiceColor;
         });
         this.choicesHeight = 0;
     }
-
+    
     loadChoices(nodeKey) {
         this.resetChoices();
         
         var nodeData = _.find(this.storyData, o => o.KEY === nodeKey);
-
+        
         var index = 0;
-        if (nodeData.CHOICES.length > 0) {
+        if (nodeData.CHOICES && nodeData.CHOICES.length > 0) {
             _.forEach(nodeData.CHOICES, (i) => {
                 if (this.checkChoiceDisplay(i)) {
                     this.choices[index].setText(i.TEXT);
-                    this.choices[index].y = this.uiFrames.bottom.y + this.choicesHeight;
-                    // this.choices[index].y = this.uiFrames.bottom.y + this.choicesHeight + (choicesSpacer * index);
+                    this.choices[index].y = this.uiFrames.bottom.y + this.choicesHeight + ((index !== 0) ? choicesSpacer : 0);
                     this.choices[index].fill = this.checkChoiceColor(i);
                     this.choicesHeight += this.choices[index].height + ((index !== 0) ? choicesSpacer : 0);
-                    // this.choicesHeight += this.choices[index].height + (choicesSpacer * index);
-
+                    
                     this.loadedChoices[index] = {
                         color: this.choices[index].fill,
                         data: i
@@ -285,14 +313,13 @@ export default class StoryManager {
             this.loadedChoices[0] = {
                 color: this.choices[0].fill,
                 data: {
+                    ACTION: 'next',
                     NEXT: nodeData.NEXT
                 }
             };
-        } else {
-            alert('No Choices or NEXT node.')   
         }
     }
-
+    
     checkChoiceDisplay(choiceData) {
         // TODO: Add Choice Costs
         
@@ -306,7 +333,7 @@ export default class StoryManager {
                 return '#F00E0E';
             }
         }
-
+        
         if (typeof(choiceData.REQUIRED_TYPE) !== "undefined") {
             if (choiceData.REQUIRED_TYPE === 'power') {
                 return fontColorPower;
@@ -321,7 +348,7 @@ export default class StoryManager {
                 return fontColorLove;
             }
         }
-
+        
         return choiceColor;
     }
     
@@ -337,7 +364,7 @@ export default class StoryManager {
             this.game.add.tween(choice).to({ alpha: 1 }, 200, Phaser.Easing.Linear.None, true);
         }, this);
     }
-
+    
     sliderOver(sprite) {
         sprite.frame = 1;
     }
@@ -355,7 +382,10 @@ export default class StoryManager {
     }
     
     choiceOut(item, index) {
-        item.fill = this.loadedChoices[index].color;
+        let choice = this.loadedChoices[index];
+        if (choice && choice.color) {
+            item.fill = choice.color;
+        }
     }
     
     choiceDown(item) {
@@ -365,5 +395,25 @@ export default class StoryManager {
     choiceUp(item, index) {
         item.fill = choiceHighlightColor;
         this.makeDecision(index);
+    }
+
+    stopAudio() {
+        if (this.backgroundSounds && this.backgroundSounds.length > 0) {
+            // Stop and Remove
+            _.forEach(this.backgroundSounds, (x) => {
+                x.sound.stop();
+            });
+        }
+    }
+
+    resumeAudio() {
+        if (this.backgroundSounds && this.backgroundSounds.length > 0) {
+            // Stop and Remove
+            _.forEach(this.backgroundSounds, (x) => {
+                if (x.loop) {
+                    x.sound.play();
+                }
+            });
+        }
     }
 }

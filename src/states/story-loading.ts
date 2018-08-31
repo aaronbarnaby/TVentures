@@ -1,4 +1,6 @@
+import * as _ from 'lodash';
 import { Globals } from "../globals";
+import { STORYBOOKS } from '../config';
 
 var timeOut;
 
@@ -12,6 +14,25 @@ export default class StoryLoadingState extends Phaser.State {
         loaderBar.anchor.setTo(0.5);
         
         this.load.setPreloadSprite(loaderBar);
+
+        let storyBook = _.find(STORYBOOKS, i => i.Key === Globals.save.currentStory);
+        if (!storyBook) {
+            alert('Unable to find story book.');
+            this.state.start('Menu');
+            return;
+        }
+        // Load Story Assets
+        if (storyBook.Assets) {
+            _.forEach(storyBook.Assets, (asset) => {
+                if (asset.type === 'audio') {
+                    this.load.audio(asset.target, asset.path, true);
+                }
+
+                if (asset.type === 'image') {
+                    this.load.image(asset.target, asset.path);
+                }
+            });
+        }
         
         timeOut = this.time.events.add(Phaser.Timer.SECOND * 20, this.loadingTimeOut, this);
         

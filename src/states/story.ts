@@ -15,7 +15,7 @@ export default class StoryState extends Phaser.State {
         this.setupBackground();
         this.setupIcons();
         this.fadeInScreen();
-
+        
         this.storyManager = new StoryManager();
     }
     
@@ -39,6 +39,10 @@ export default class StoryState extends Phaser.State {
         iconSaveButton.anchor.setTo(0.5, 0.5);
         iconSaveButton.frame = 3;
         iconSaveButton.input.useHandCursor = true;
+        
+        var iconSoundButton = this.game.add.button(this.game.width - iconXoffset, this.game.height * 0.9283, 'icons', this.toggleSound, this, 7, 6, 8);
+        iconSoundButton.anchor.setTo(0.5, 0.5);
+        iconSoundButton.frame = 6;
     }
     
     fadeInScreen() {
@@ -54,7 +58,20 @@ export default class StoryState extends Phaser.State {
     }
     
     iconSave() {
+        this.storyManager.stopAudio();
         Globals.saveManager.saveGame(true);
+    }
+
+    toggleSound() {
+        Globals.hasSound = !Globals.hasSound;
+
+        if (Globals.hasSound) {
+            // Enabled
+            this.storyManager.resumeAudio();
+        } else {
+            // Disabled
+            this.storyManager.stopAudio();
+        }
     }
     
     update() {
@@ -62,7 +79,7 @@ export default class StoryState extends Phaser.State {
         if (this.storyManager.uiSliders.top.visible === true) {
             this.storyManager.storyText.y = this.storyManager.uiText.top.topgap - (((this.storyManager.uiSliders.top.y - this.storyManager.uiText.top.topgap) / this.storyManager.uiText.top.rightgap) * this.storyManager.uiText.top.distance);
         }
-
+        
         if (this.storyManager.uiSliders.bottom.visible === true) {
             this.storyManager.choicesGroup.y = 1 - (((this.storyManager.uiSliders.bottom.y - this.storyManager.uiText.bottom.topgap) / this.storyManager.uiText.bottom.rightgap) * this.storyManager.uiText.bottom.distance);
         }

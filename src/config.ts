@@ -22,7 +22,14 @@ export let STORYBOOKS = [
   {
     Key: "TWIN_TERROR",
     Name: "Twin Terror",
-    StartingNode: "TT0"
+    StartingNode: "TT0",
+    Assets: [
+      { type: "audio", path: "./assets/sounds/kids-laughing-then-crying.mp3", target: "kids_opening" },
+      { type: "audio", path: "./assets/sounds/monster-coming.mp3", target: "monster_coming" },
+      { type: "audio", path: "./assets/sounds/outside-running.mp3", target: "outside_running" },
+      { type: "audio", path: "./assets/sounds/monster-growl.mp3", target: "monster_growl" },
+      { type: "audio", path: "./assets/sounds/monster-roar.mp3", target: "monster_roar" }
+    ]
   }
 ];
 

@@ -14,6 +14,7 @@ export let Globals: IGlobals = {
         charactors: null,
         textManager: new TextManager()
     },
+    hasSound: true,
 };
 
 interface IGlobals {
@@ -25,5 +26,7 @@ interface IGlobals {
     saveManager: SaveManager;
 
     activeStory: IStory;
+
+    hasSound: boolean;
     
 }

@@ -9,7 +9,7 @@ export default class TextManager {
     loadStory(storyKey: string) {
         let storyBook = _.find(STORYBOOKS, i => i.Key === storyKey);
 
-        console.log(`%c Loading story ${storyBook.Name}`, 'color:white; background:orange;');
+        console.log(`%c Loading Story ${storyBook.Name}`, 'color:white; background:orange;');
 
         if (storyKey === "TWIN_TERROR") {
             this.loadJSON(require("../stories/twin_terror.json"), require("../stories/twin_terror_charactors.json"), storyBook.StartingNode);

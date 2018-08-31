@@ -22,6 +22,11 @@ export default class SaveManager {
         }
     }
 
+    hasSave() {
+        let storage = localStorage.getItem("tventures-save");
+        return (typeof(storage) !== "undefined" && storage !== null);
+    }
+
     saveGame(returnToMenu: boolean) {
         localStorage.setItem("tventures-save", JSON.stringify(Globals.save.exportData()));
 

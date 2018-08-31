@@ -6,7 +6,7 @@ export default interface StoryNode {
 
     TEXT: string;
 
-    ONENTER: string;
+    ONENTER: any;
 
     CHOICES: [ChoiceData];
 

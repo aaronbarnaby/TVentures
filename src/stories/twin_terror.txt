@@ -1,0 +1,37 @@
+[0]
+You wake up and find yourself in the pitch black, after pushing yourself to your feet you notice a porch light in the distance.\n\n
+As you walk up to the house you notice that all the curtains are closed and you have no way to tell if anyone is home, however the front door is slightly open.
+
+- Enter House [1]
+- Leave [E1]
+
+[E1]
+You decide you want to part of whatever is in that house, you turn away and start the walk down the road.\n\n\n\n
+THE END.
+
+[1]
+[AUDIO = kids-laughing-then-crying, SINGLE]
+As you enter the house you hear the sound of children playing and laughing, It seems to be coming from upstairs.\n\n
+After a short while the laughing stops and you hear a cry to the point of screaming from a girl.\n\n
+As you look around the room you entered you notice the stairs directly in front of you as well as two doors, One to the left and one right.
+
+- Head upstairs towards the sounds that you heard. [2]
+- Enter the door on the left [2B]
+- Enter the door on the right [3C]
+- Exit the house [D1]
+
+[D1]
+[AUDIO = monster-coming, SINGLE][AUDIO = outside-run, LOOP]
+As you turn to leave the house you hear a large thumping, faster and faster.\n\n
+You dare not turn around to look so you just start running.
+
+- Continue [D1-1]
+
+[D1-1]
+Before you have time to react you feel a sharp pain in your chest.\n\n
+You look down and see a spike like claw that seems to have impaled you.\n\n\n
+Before you know it you fall flat on the ground and everything goes black.\n\n\n\n
+GAME OVER
+
+- Start Again [0]
+- Return To Menu [>Menu]
