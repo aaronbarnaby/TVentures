@@ -15,7 +15,11 @@ export let ASSETS = {
   "slider01_back": "./assets/images/slider01_back.png",
   "slider02_back": "./assets/images/slider02_back.png",
   "rectangle_black": "./assets/images/primitive_rectangle_black.png",
-  "dice": "./assets/images/dice.png"
+  "buttons": "./assets/images/buttons.png",
+  "dice": "./assets/images/diceWhite.png",
+  "dice_red": "./assets/images/diceRed.png",
+  "close_btn": "./assets/images/close_btn.png",
+  "modal_bg": "./assets/images/modal_bg.png"
 };
 
 export let STORYBOOKS = [
@@ -40,6 +44,6 @@ export let CONFIG = {
   gameMinHeight: 300,
   localStorageName: 'tventures',
   copyrightDate: '2018',
-  debugMode: false,
+  debugMode: true,
   webfonts: ['Fira Sans:500']
 };

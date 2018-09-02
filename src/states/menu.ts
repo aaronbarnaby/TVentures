@@ -32,7 +32,7 @@ export default class MenuState extends Phaser.State {
         this.music = this.add.audio('melody', 0.1, true);
 
         if (Globals.hasSound) {
-            this.music.play();
+            // this.music.play(); // Disabled for Development
         }
     }
     
@@ -51,6 +51,12 @@ export default class MenuState extends Phaser.State {
         
         // Resume Game
         this.saveManager.loadGame();
+    }
+
+    bonusGameStart() {
+        this.music.stop();
+
+        this.game.state.start('BonusLoading');
     }
 
     toggleSound() {
@@ -84,6 +90,13 @@ export default class MenuState extends Phaser.State {
         if (!this.saveManager.hasSave()) {
             loadGameButton.visible = false;
         }
+
+        var bonusGameButtonGroup = this.game.add.group();
+        var bonusGameButton = this.game.add.button(this.game.width / 2, this.game.height * 0.75, 'buttons', this.bonusGameStart, this, 5, 4, 5, null, bonusGameButtonGroup);
+        bonusGameButton.input.useHandCursor = true;
+        bonusGameButton.x = bonusGameButton.x - (bonusGameButton.width / 2) + 5;
+        this.game.add.text(bonusGameButton.x + 50, bonusGameButton.y + 5, 'Bonus Game', { font: 'bold 12pt Arial', fill: '#FFFFFF', align: 'left' }, bonusGameButtonGroup);
+        // bonusGameButtonGroup.visible = false;
         
         var iconXoffset = this.game.width * 0.0625;
         var iconSoundButton = this.game.add.button(this.game.width - iconXoffset, this.game.height * 0.9283, 'icons', this.toggleSound, this, 7, 6, 8);

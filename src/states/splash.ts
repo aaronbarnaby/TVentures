@@ -14,8 +14,13 @@ export default class SplashState extends Phaser.State {
         this.fontsLoaded = this.fontsLoaded.bind(this);
     }
     
-    preload() {
-        this.initializeScaleMode();
+    preload() { 
+        let loaderBg = this.add.sprite(this.game.world.centerX, this.game.world.centerY, "loaderBg");
+        let loaderBar = this.add.sprite(this.game.world.centerX, this.game.world.centerY, "loaderBar");
+        loaderBg.anchor.setTo(0.5);
+        loaderBar.anchor.setTo(0.5);
+        
+        this.load.setPreloadSprite(loaderBar);
         
         /// Load WebFonts
         if (CONFIG.webfonts.length) {
@@ -28,8 +33,6 @@ export default class SplashState extends Phaser.State {
         }
         
         /// Load Assets
-        this.load.image("loaderBg", ASSETS.loaderBg);
-        this.load.image("loaderBar", ASSETS.loadingBar);
         this.load.image('menu_bg01', ASSETS.menuBg01);
         this.load.image('menu_bg_circle01', ASSETS.menuBgCircle01);
         this.load.image('menu_bg_circle02', ASSETS.menuBgCircle02);
@@ -38,11 +41,17 @@ export default class SplashState extends Phaser.State {
         this.load.image('slider02_back', ASSETS.slider02_back);
         this.load.image('rectangle_black', ASSETS.rectangle_black);
         this.load.image('blackGradient', ASSETS.blackGradient);
+
+        this.load.image('modal_bg', ASSETS.modal_bg);
+        this.load.image('close_btn', ASSETS.close_btn);
         
         this.load.spritesheet('menu01', ASSETS.menu01, 146, 26);
         this.load.spritesheet('menu02', ASSETS.menu02, 58, 30);
         this.load.spritesheet('icons', ASSETS.icons, 40, 40);
         this.load.spritesheet('slider01', ASSETS.slider01, 13, 62);
+        this.load.spritesheet('buttons', ASSETS.buttons, 200, 28);
+        this.load.spritesheet('dice', ASSETS.dice, 64, 64);
+        this.load.spritesheet('dice_red', ASSETS.dice_red, 64, 64);
         
         this.load.audio('melody', ASSETS.melody, true);
     }
@@ -54,7 +63,7 @@ export default class SplashState extends Phaser.State {
         loaderBar.anchor.setTo(0.5);
         
         this.load.setPreloadSprite(loaderBar);
-        
+
         // Set Global `game` variable
         Globals.game = this.game;
     }

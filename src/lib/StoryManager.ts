@@ -1,7 +1,9 @@
 import * as _ from 'lodash';
+import { Globals } from '../globals';
 import Sliders from '../interfaces/sliders';
 import StoryNode from '../interfaces/storyNode';
-import { Globals } from '../globals';
+
+import Dice from '../components/dice';
 
 var mainFont = '500 12.5pt Fira Sans';
 var mainFontColor = '#FFBD29';
@@ -20,10 +22,13 @@ export default class StoryManager {
     game: Phaser.Game;
     
     // UI
+    uiDebug: any = {};
     uiText: any = {};
     uiFrames: any = {};
     uiSliders: Sliders;
     uiMasks: any = {};
+    uiButtons: any = {};
+    uiModal: any;
     
     textStyle: any;
     choicesStyle: any;
@@ -53,17 +58,19 @@ export default class StoryManager {
         this.setupSliders();
         this.setupMasks();
         
+        this.setupButtons();
+        
         this.setupTextStyles();
         this.setupText();
         
         this.setupChoices();
-
+        
         this.loadStoryNode(Globals.save.currentNodeKey);
     }
     
     makeDecision(choiceNumber) {
         this.resetAudio(); // Stop any looping background sound from previous node
-
+        
         // Add Method to Access Save Instance
         Globals.save.writeToGameLog(choiceNumber);
         
@@ -74,7 +81,7 @@ export default class StoryManager {
             
             this.loadStoryNode(nextNode);
         }
-
+        
         if (choiceData.ACTION === 'redirect') {
             this.game.state.start(choiceData.TARGET);
         }
@@ -129,12 +136,138 @@ export default class StoryManager {
             alert(`Invalid Target Node: ${node}`);
         }
     }
+    
+    characterClick() {
+        
+    }
+    
+    abilitiesClick() {
+        
+    }
+    
+    customClick() {
+        this.displayModal('dice_3');
+    }
+    
+    displayModal(type) {
+        this.hideModal();
+        
+        var hasClose = true;
+        
+        var modal = this.game.add.group();
+        
+        var back = this.game.add.sprite(0, 0, 'modal_bg');
+        back.height = 200;
+        back.z = 10;
+        modal.add(back);
+        
+        modal.x = (this.game.width  / 2) - (modal.width / 2);
+        modal.y = (this.game.height / 2) - (modal.height / 2);
+        
+        var typeSplit = type.split('_');
+        var handle = typeSplit[0];
+        if (handle === 'dice') {
+            var diceAmount = typeSplit[1]; // 1 - 5
+            if (!diceAmount) { diceAmount = 1; }
+            if (diceAmount > 5) { diceAmount = 5; }
+            
+            var diceGroup = this.game.add.group();
+            
+            var diceSpacer = 20;
+            var diceWidth = 0;
+            for (var i = 0; i < diceAmount; i++) {
+                var dice = new Dice(diceWidth + (diceSpacer * i), diceGroup.y);
+                dice.z = 11;
+                diceWidth += dice.width;
+                diceGroup.add(dice);
+            }
+            
+            diceGroup.x = ((modal.width / 2) - (diceGroup.width / 2)) + 32;
+            diceGroup.y = modal.height * 0.3;
+            modal.add(diceGroup);
+            
+            // Total Display
+            var diceTotal = this.game.add.text((modal.width / 2) - 20, modal.height * 0.65, '', { font: 'bold 26pt Arial', fill: '#FFFFFF', align: 'center' });
+            modal.add(diceTotal);
+            
+            var diceControls = this.game.add.group();
+            var rollDiceBtn = this.game.add.button(((modal.width / 2) - 95), modal.height * 0.7, 'buttons', this.rollDice, this, 5, 4, 5, null, diceControls);
+            rollDiceBtn.input.useHandCursor = true;
+            this.game.add.text(rollDiceBtn.x + 65, rollDiceBtn.y + 5, 'Roll Dice', { font: 'bold 12pt Arial', fill: choiceColor, align: 'left' }, diceControls);
+            
+            modal.add(diceControls);
+            
+            hasClose = false;
+        }
+        
+        if (hasClose) {
+            var closeBtn = this.game.add.sprite(back.width - 5, 10, 'close_btn');
+            closeBtn.z = 9;
+            closeBtn.inputEnabled = true;
+            closeBtn.events.onInputDown.add(this.hideModal, this);
+            
+            modal.add(closeBtn);
+        }
+        
+        this.uiModal = {};
+        this.uiModal.modal = modal;
+        
+        if (handle === 'dice') {
+            this.uiModal.diceGroup = diceGroup;
+            this.uiModal.diceControls = diceControls;
+            this.uiModal.diceTotal = diceTotal;
+        }
+    }
+    
+    rollDice() {
+        if (this.uiModal && this.uiModal.diceGroup) {
+            // Remove Controls When Triggered
+            this.uiModal.diceControls.visible = false;
 
+            // Trigger Dice Roll
+            this.uiModal.diceGroup.callAll('roll', null);
+            this.game.time.events.add(100, this.rollDiceCompleted, this);
+        }
+    }
+    
+    rollDiceCompleted() {
+        if (this.uiModal && this.uiModal.diceGroup) {
+            var rollComplete = true;
+            this.uiModal.diceGroup.forEach((item) => {
+                if (item.isAnimationRunning())
+                rollComplete = false;
+            }, this);
+            if (rollComplete) {
+                var total = 0;
+                this.uiModal.diceGroup.forEach(function(item) { total += item.value(); });
+                
+                this.uiModal.diceTotal.setText(total);
+                this.game.time.events.add(2000, this.rollDiceCallback, this, total);
+            } else {
+                var timer = this.game.time.events.add(100, this.rollDiceCompleted, this);
+            }
+        }
+    }
+
+    rollDiceCallback(diceTotal) {
+        console.log(`Dice Total: ${diceTotal}`);
+        // TODO: Do something with the dice total that was required.
+
+        this.hideModal();
+    }
+    
+    hideModal() {
+        if (this.uiModal && this.uiModal.modal) {
+            this.uiModal.modal.destroy();
+            this.uiModal = null;
+        }
+    }
+    
     resetAudio() {
         this.stopAudio();
         this.backgroundSounds = null;
     }
-
+    
     setupTextStyles() {
         this.textStyle = { font: mainFont, fill: mainFontColor, align: 'left', wordWrap: true, wordWrapWidth: this.uiFrames.top.width };
         this.choicesStyle = { font: 'bold 12pt Arial', fill: choiceColor, align: 'left', wordWrap: true, wordWrapWidth: this.uiFrames.bottom.width };
@@ -147,18 +280,47 @@ export default class StoryManager {
     
     setupFrames() {
         this.uiFrames.top = {
-            width: Math.round(this.game.width * 0.7225),
-            height: Math.round(this.game.height * 0.5),
-            y: Math.round(this.game.height * 0.12)
+            width: Math.round(this.game.width * 0.8),
+            height: Math.round(this.game.height * 0.45),
+            y: Math.round(this.game.height * 0.05)
         };
         this.uiFrames.top.x = Math.round(((this.game.width - this.uiFrames.top.width) / 2) - 11);
         
         this.uiFrames.bottom = {
-            width: Math.round(this.uiFrames.top.width),
+            width: Math.round(this.uiFrames.top.width) + 60,
             height: Math.round(this.game.height * 0.275 - 5),
-            x: this.uiFrames.top.x
+            x: this.uiFrames.top.x - 20
         };
         this.uiFrames.bottom.y = Math.round(((this.game.height - this.uiFrames.top.y - this.uiFrames.top.height - this.uiFrames.bottom.height) / 2) + this.uiFrames.top.y + this.uiFrames.top.height);
+        
+        this.uiFrames.buttons = {
+            width: Math.round(this.uiFrames.top.width),
+            height: 40,
+            x: this.uiFrames.top.x,
+            y: this.uiFrames.bottom.y - 50
+        };
+    }
+    
+    setupButtons() {
+        var buttonTextStyle = { font: 'bold 12pt Arial', fill: choiceColor, align: 'left' };
+        
+        this.uiButtons.characterGroup = this.game.add.group();
+        this.uiButtons.character = this.game.add.button(this.uiFrames.buttons.x, this.uiFrames.buttons.y, 'buttons', this.characterClick, this, 1, 0, 1, null, this.uiButtons.characterGroup);
+        this.uiButtons.character.input.useHandCursor = true;
+        this.game.add.text(this.uiButtons.character.x + 50, this.uiButtons.character.y + 5, 'CHARACTER', buttonTextStyle, this.uiButtons.characterGroup);
+        this.uiButtons.characterGroup.visible = false;
+        
+        this.uiButtons.abilitiesGroup = this.game.add.group();
+        this.uiButtons.abilities = this.game.add.button((this.uiFrames.buttons.x + this.uiButtons.character.width + 15), this.uiFrames.buttons.y, 'buttons', this.abilitiesClick, this, 3, 2, 3, null, this.uiButtons.abilitiesGroup);
+        this.uiButtons.abilities.input.useHandCursor = true;
+        this.game.add.text(this.uiButtons.abilities.x + 60, this.uiButtons.abilities.y + 5, 'ABILITIES', buttonTextStyle, this.uiButtons.abilitiesGroup);
+        this.uiButtons.abilitiesGroup.visible = false;
+        
+        this.uiButtons.customGroup = this.game.add.group();
+        this.uiButtons.custom = this.game.add.button((this.uiFrames.buttons.x + this.uiButtons.character.width + this.uiButtons.abilities.width + 30), this.uiFrames.buttons.y, 'buttons', this.customClick, this, 5, 4, 5, null, this.uiButtons.customGroup);
+        this.uiButtons.custom.input.useHandCursor = true;
+        this.game.add.text(this.uiButtons.custom.x + 65, this.uiButtons.custom.y + 5, 'CUSTOM', buttonTextStyle, this.uiButtons.customGroup);
+        this.uiButtons.customGroup.visible = false;
     }
     
     setupSliders() {
@@ -396,7 +558,7 @@ export default class StoryManager {
         item.fill = choiceHighlightColor;
         this.makeDecision(index);
     }
-
+    
     stopAudio() {
         if (this.backgroundSounds && this.backgroundSounds.length > 0) {
             // Stop and Remove
@@ -405,7 +567,7 @@ export default class StoryManager {
             });
         }
     }
-
+    
     resumeAudio() {
         if (this.backgroundSounds && this.backgroundSounds.length > 0) {
             // Stop and Remove
@@ -415,5 +577,41 @@ export default class StoryManager {
                 }
             });
         }
+    }
+    
+    showBorders() {
+        var topBorder = this.game.add.graphics(this.uiFrames.top.x, this.uiFrames.top.y);
+        topBorder.lineStyle(2, 0xffd900, 1);
+        topBorder.moveTo(0, 0);
+        topBorder.lineTo(this.uiFrames.top.width, 0);
+        topBorder.lineTo(this.uiFrames.top.width, this.uiFrames.top.height);
+        topBorder.lineTo(0, this.uiFrames.top.height);
+        topBorder.lineTo(0, 0);
+        this.uiDebug.topBorder = topBorder;
+        
+        var bottomBorder = this.game.add.graphics(this.uiFrames.bottom.x, this.uiFrames.bottom.y);
+        bottomBorder.lineStyle(2, 0xffd900, 1);
+        bottomBorder.moveTo(0, 0);
+        bottomBorder.lineTo(this.uiFrames.bottom.width, 0);
+        bottomBorder.lineTo(this.uiFrames.bottom.width, this.uiFrames.bottom.height);
+        bottomBorder.lineTo(0, this.uiFrames.bottom.height);
+        bottomBorder.lineTo(0, 0);
+        this.uiDebug.bottomBorder = bottomBorder;
+        
+        var buttonsBorder = this.game.add.graphics(this.uiFrames.buttons.x, this.uiFrames.buttons.y);
+        buttonsBorder.lineStyle(2, 0xffd900, 1);
+        buttonsBorder.moveTo(0, 0);
+        buttonsBorder.lineTo(this.uiFrames.buttons.width, 0);
+        buttonsBorder.lineTo(this.uiFrames.buttons.width, this.uiFrames.buttons.height);
+        buttonsBorder.lineTo(0, this.uiFrames.buttons.height);
+        buttonsBorder.lineTo(0, 0);
+        this.uiDebug.buttonsBorder = buttonsBorder;
+    }
+    
+    removeBorders() {
+        this.uiDebug.topBorder.destroy();
+        this.uiDebug.bottomBorder.destroy();
+        this.uiDebug.buttonsBorder.destroy();
+        this.uiDebug = {};
     }
 }

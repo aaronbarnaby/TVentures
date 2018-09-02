@@ -1,11 +1,13 @@
 import * as _ from 'lodash';
 import StoryManager from '../lib/StoryManager';
-import SaveManager from '../lib/SaveManager';
 import { Globals } from '../globals';
+import { CONFIG } from '../config';
 
 export default class StoryState extends Phaser.State {
     
     storyManager: StoryManager;
+    
+    keys: any = {};
     
     init() {
         this.game.stage.backgroundColor = '#000000';
@@ -17,12 +19,35 @@ export default class StoryState extends Phaser.State {
         this.fadeInScreen();
         
         this.storyManager = new StoryManager();
+        
+        // Setup Keys for Debug
+        if (CONFIG.debugMode) {
+            this.keys.ctrl = this.game.input.keyboard.addKey(Phaser.Keyboard.CONTROL);
+            this.keys.B = this.game.input.keyboard.addKey(Phaser.Keyboard.B);
+            this.keys.C = this.game.input.keyboard.addKey(Phaser.Keyboard.C);
+            this.keys.H = this.game.input.keyboard.addKey(Phaser.Keyboard.H);
+            
+            // DEBUG MODE Keyboard Inputs
+            // - Ctrl + B = Borders
+            // - Ctrl + C = Custom Modal
+            
+            this.keys.B.onDown.add(this.toggleBorders, this);
+            this.keys.C.onDown.add(this.showDialog, this);
+            this.keys.H.onDown.add(this.hideDialog, this);
+        }
     }
+
+    // Story UI
+    
+    // TODO: Move Stage components here
+    
+    
+    // Core UI
     
     setupBackground() {
         var menuBg = this.game.add.sprite(this.game.width / 2, this.game.height / 2, 'menu_bg01');
         menuBg.anchor.setTo(0.5, 0.5);
-        menuBg.alpha = 0.75;
+        menuBg.alpha = 0.5;
         
         var blackGradient = this.game.add.sprite(0, 0, 'blackGradient');
         var blackGradient2 = this.game.add.sprite(0, 0, 'blackGradient');
@@ -40,7 +65,7 @@ export default class StoryState extends Phaser.State {
         iconSaveButton.frame = 3;
         iconSaveButton.input.useHandCursor = true;
         
-        var iconSoundButton = this.game.add.button(this.game.width - iconXoffset, this.game.height * 0.9283, 'icons', this.toggleSound, this, 7, 6, 8);
+        var iconSoundButton = this.game.add.button(this.game.width - iconXoffset, this.game.height * 0.15, 'icons', this.toggleSound, this, 7, 6, 8);
         iconSoundButton.anchor.setTo(0.5, 0.5);
         iconSoundButton.frame = 6;
     }
@@ -61,10 +86,10 @@ export default class StoryState extends Phaser.State {
         this.storyManager.stopAudio();
         Globals.saveManager.saveGame(true);
     }
-
+    
     toggleSound() {
         Globals.hasSound = !Globals.hasSound;
-
+        
         if (Globals.hasSound) {
             // Enabled
             this.storyManager.resumeAudio();
@@ -82,6 +107,30 @@ export default class StoryState extends Phaser.State {
         
         if (this.storyManager.uiSliders.bottom.visible === true) {
             this.storyManager.choicesGroup.y = 1 - (((this.storyManager.uiSliders.bottom.y - this.storyManager.uiText.bottom.topgap) / this.storyManager.uiText.bottom.rightgap) * this.storyManager.uiText.bottom.distance);
+        }
+    }
+
+    // Debug Methods
+    toggleBorders() {
+        if (this.keys.ctrl.isDown) {
+            // Toggle Borders
+            if (this.storyManager.uiDebug && this.storyManager.uiDebug.topBorder) {
+                this.storyManager.removeBorders();
+            } else {
+                this.storyManager.showBorders();
+            }
+        }
+    }
+
+    showDialog() {
+        if (this.keys.ctrl.isDown) {
+            this.storyManager.customClick();
+        }
+    }
+
+    hideDialog() {
+        if (this.keys.ctrl.isDown) {
+            this.storyManager.hideModal();
         }
     }
 }

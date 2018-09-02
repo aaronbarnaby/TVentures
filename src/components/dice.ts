@@ -1,93 +1,66 @@
+import * as Phaser from 'phaser-ce';
+import { Globals } from "../globals";
 
-// PRELOAD
-// this.load.script("BlurX", "BlurX.js");
-// this.load.script("BlurY", "BlurY.js");
-// this.load.spritesheet("dice", ASSETS.dice, 100, 100);
-
-// IMPLEMENT
-// var d = new Dice(i*150+100, 100);
-// d.call('roll');
-// var timer = this.game.time.events.add(100, this.rollDiceComplete, this);
-
-// rollDiceComplete: function () {
-//     var rollComplete = true;
-//     if (d.isAnimationRunning()) {
-//         rollComplete = false;
-//     }
-//     if (rollComplete) {
-//         var value = d.value();
-//     } else {
-//         var timer = this.game.time.events.add(100, this.rollDiceComplete, this);
-//     }
-// }
-
-// DICE CODE: http://www.netexl.com/blog/phase-dice-roller/
-// export default class Dice {
-//     constructor(x: number, y: number) {
-//         Phaser.Sprite.call(this, mygame, x, y, 'dice');
+export default class Dice extends Phaser.Sprite {
+    
+    tween: any;
+    animation: any;
+    
+    constructor(x: number, y: number, type: string = "dice") {
+        var game = Globals.game as Phaser.Game;
+        super(game, x, y, type);
         
-//         this.tween;
-//         this.anim;
-//         this.blurX = mygame.add.filter("BlurX");  // Blur filters taken from
-//         this.blurY = mygame.add.filter("BlurY");  // Filters -> blur example
+        this.anchor.setTo(0.5);
         
-//         this.anchor.setTo(0.5, 0.5);
+        var frames = [];
+        for (var i = 0; i < 15; i++) {
+            frames[i] = this.game.rnd.pick([1,2,5,6,4,0]);
+        }
         
-//         var i;
-//         var frames = [];
-//         for (i=0; i < 15; i++) {
-//             frames[i] = mygame.rnd.pick([0,1,2,3,4,5]);
-//         }
+        this.animation = this.animations.add('roll', frames);
+        this.animation.onComplete.add(this.rollComplete, this);
         
-//         // the animation displays the frames from the spritesheet in a random order
-//         this.anim = this.animations.add("roll", frames);
-//         this.anim.onComplete.add(this.rollComplete, this); 
+        this.frame = 1;
         
-//         this.frame = 1;
-        
-//         mygame.add.existing(this);
-//     }
+        this.game.add.existing(this);
+    }
     
-//     Dice.prototype = Object.create(Phaser.Sprite.prototype);
-//     Dice.prototype.constructor = Dice;
+    roll() {
+        this.animations.play('roll', 20);
+    }
     
-//     Dice.prototype.roll = function() {
-//         this.filters = [this.blurX, this.blurY];
-//         this.animations.play("roll", 20);
-//     };
+    rollComplete() {
+        this.filters = null;
+        this.frame = this.game.rnd.pick([1,2,5,6,4,0]);
+        this.angle = 0;
+    }
     
-//     Dice.prototype.rollComplete = function() {
-//         this.filters = null;
-//         this.frame = mygame.rnd.pick([0,1,2,3,4,5]);
-//     };
+    isAnimationRunning() {
+        return this.animation.isPlaying;
+    }
     
-//     Dice.prototype.update = function() {
-//         if (this.anim.isPlaying) {
-//             this.angle = mygame.rnd.angle();
-//         }
-//     };
+    value() {
+        switch(this.frame) {
+            case 1:
+                return 1;
+            case 2:
+                return 2;
+            case 5:
+                return 3;
+            case 6:
+                return 4;
+            case 4:
+                return 5;
+            case 0:
+                return 6;
+            default:
+                return null;
+        }
+    }
     
-//     Dice.prototype.isAnimationRunning = function () {
-//         return this.anim.isPlaying;
-//     };
-    
-    
-//     Dice.prototype.value = function() {
-//         switch(this.frame) {
-//             case 0:
-//             return 1;
-//             case 1:
-//             return 2;
-//             case 2:
-//             return 3;
-//             case 3:
-//             return 4;
-//             case 4:
-//             return 5;
-//             case 5:
-//             return 6;
-//             default:
-//             return null;
-//         }
-//     };
-// }
+    update() {
+        if (this.animation.isPlaying) {
+            this.angle = this.game.rnd.angle();
+        }
+    }
+}
