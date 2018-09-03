@@ -96,7 +96,7 @@ export default class MenuState extends Phaser.State {
         bonusGameButton.input.useHandCursor = true;
         bonusGameButton.x = bonusGameButton.x - (bonusGameButton.width / 2) + 5;
         this.game.add.text(bonusGameButton.x + 50, bonusGameButton.y + 5, 'Bonus Game', { font: 'bold 12pt Arial', fill: '#FFFFFF', align: 'left' }, bonusGameButtonGroup);
-        // bonusGameButtonGroup.visible = false;
+        bonusGameButtonGroup.visible = false;
         
         var iconXoffset = this.game.width * 0.0625;
         var iconSoundButton = this.game.add.button(this.game.width - iconXoffset, this.game.height * 0.9283, 'icons', this.toggleSound, this, 7, 6, 8);

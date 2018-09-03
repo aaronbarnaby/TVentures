@@ -1,7 +1,7 @@
 import * as Phaser from 'phaser-ce';
 
 import { CONFIG } from './config';
-import { SplashState, MenuState, StoryState, StoryLoadingState, BootState, BonusLoadingState, BonusGameState } from './states';
+import { SplashState, MenuState, StoryState, StoryLoadingState, BootState } from './states';
 
 class Game extends Phaser.Game {
 	constructor() {
@@ -18,8 +18,8 @@ class Game extends Phaser.Game {
 		this.state.add('Menu', MenuState, false);
 
 		// Bonus Game
-		this.state.add('BonusLoading', BonusLoadingState, false);
-		this.state.add('BonusGame', BonusGameState, false);
+		//this.state.add('BonusLoading', BonusLoadingState, false);
+		//this.state.add('BonusGame', BonusGameState, false);
 
 		// Story
 		this.state.add('StoryLoading', StoryLoadingState, false);
