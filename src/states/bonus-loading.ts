@@ -11,14 +11,26 @@ export default class BonusLoadingState extends Phaser.State {
         this.load.setPreloadSprite(loaderBar);
         
         // Load Bonus Game Asses
-        this.load.tilemap('map', './assets/bonus/packman/maps/map_packman.json', null, Phaser.Tilemap.TILED_JSON);
+
+        // Sounds
+        this.load.audio('pacman_beginning', './assets/bonus/pacman/sounds/pacman_beginning.wav', true);
+        this.load.audio('pacman_eatpill', './assets/bonus/pacman/sounds/pacman_eatpill.wav', true);
+        this.load.audio('pacman_lifeup', './assets/bonus/pacman/sounds/pacman_lifeup.wav', true);
+        this.load.audio('pacman_deadghost', './assets/bonus/pacman/sounds/pacman_deadghost.wav', true);
+        this.load.audio('pacman_death', './assets/bonus/pacman/sounds/pacman_death.wav', true);
+        this.load.audio('pacman_eatfruit', './assets/bonus/pacman/sounds/pacman_eatfruit.wav', true);
+        this.load.audio('pacman_eatghost', './assets/bonus/pacman/sounds/pacman_eatghost.wav', true);
+        this.load.audio('pacman_ghostrun', './assets/bonus/pacman/sounds/pacman_ghostrun.wav', true);
+
+        // Map
+        this.load.tilemap('map', './assets/bonus/pacman/maps/map_pacman.json', null, Phaser.Tilemap.TILED_JSON);
         this.load.image('tile', './assets/bonus/pacman/maps/tile.png');
         this.load.image('safetile', './assets/bonus/pacman/maps/safetile.png');
         
         // Items
-        this.load.image('pill', './assets/bonus/packman/sprites/pills/spr_pill_0.png');
-        this.load.image('powerpill', './assets/bonus/packman/sprites/pills/spr_power_pill_0.png');
-        this.load.image('cherry', './assets/bonus/packman/sprites/cherry/spr_cherry_0.png');
+        this.load.image('dot', './assets/bonus/pacman/sprites/pills/spr_dot_0.png');
+        this.load.image('pill', './assets/bonus/pacman/sprites/pills/spr_pill_0.png');
+        this.load.image('cherry', './assets/bonus/pacman/sprites/cherry/spr_cherry_0.png');
         
         // Pacman
         this.load.spritesheet('pacman_walk', './assets/bonus/pacman/sprites/pacman/pacman_walk.png', 32, 32);

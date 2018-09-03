@@ -39,7 +39,7 @@ export let STORYBOOKS = [
 
 export let CONFIG = {
   gameWidth: 800,
-  gameHeight: 600,
+  gameHeight: 640,
   gameMinWidth: 400,
   gameMinHeight: 300,
   localStorageName: 'tventures',

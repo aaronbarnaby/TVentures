@@ -1,5 +1,11 @@
+import BonusGameState from "../states/bonus-game";
 
 export default class Pacman {
+
+    // Refs
+    state: BonusGameState;
+    math: any;
+    gridSize: any;
     
     name: string = 'pacman';
 
@@ -9,23 +15,23 @@ export default class Pacman {
 
     directions = { up: 'UP', down: 'DOWN', right: 'RIGHT', left: 'LEFT', none: 'NONE' };
     turnDirection = this.directions.none;
+    currentDirection: number;
 
-    marker = { x: 336, y: 560 };
+    marker = { x: 402, y: 528 };
     adjacentTiles = {};
     turning: any = null;
     turnPoint: any = {};
 
-    // Refs
-    state: any = null;
-
-    constructor(state: any) {
+    constructor(state: BonusGameState) {
         this.state = state;
+        this.math = state.game.math;
+        this.gridSize = state.gridSize;
 
         this.sprite = state.add.sprite(this.marker.x, this.marker.y, 'pacman_walk', 0);
         this.sprite.anchor.set(0.5);
         this.sprite.angle = 0;
         this.sprite.animations.add('packman_walk', null, 6, true);
-        state.physics.arcade.enabled(this.sprite);
+        state.physics.arcade.enable(this.sprite);
 
         this.sprite.play('packman_walk');
     }
@@ -75,10 +81,6 @@ export default class Pacman {
         }
     }
 
-    eatPill() {
-        this.state.AddToScore(this.state.pillPoints);
-    }
-
     handleInput() {
         if (this.state.cursors.up.isDown) {
             this.checkDirection(this.directions.up);
@@ -108,6 +110,14 @@ export default class Pacman {
         this.adjacentTiles[this.directions.right] = this.state.map.getTileRight(i, x, y);
         this.adjacentTiles[this.directions.up] = this.state.map.getTileAbove(i, x, y);
         this.adjacentTiles[this.directions.down] = this.state.map.getTileBelow(i, x, y);
+    }
+
+    getPosition() {
+        return new Phaser.Point((this.marker.x * this.gridSize) + (this.gridSize / 2), (this.marker.y * this.gridSize) + (this.gridSize / 2));
+    }
+
+    getCurrentDirection() {
+        return this.currentDirection;
     }
 
     update() {
