@@ -21,12 +21,8 @@ export default class BonusLoadingState extends Phaser.State {
         this.load.image('cherry', './assets/bonus/packman/sprites/cherry/spr_cherry_0.png');
         
         // Pacman
-        var packman_spritesheet = {
-			walk: { name: 'pacman_walk', path: './assets/bonus/pacman/sprites/pacman/pacman_walk.png' },
-			death: { name: 'pacman_death', path: './assets/bonus/pacman/sprites/pacman/pacman_death.png' },
-		};
-        this.load.spritesheet(packman_spritesheet.walk.name, packman_spritesheet.walk.path, 32, 32);
-        this.load.spritesheet(packman_spritesheet.death.name, packman_spritesheet.death.path, 32, 32);
+        this.load.spritesheet('pacman_walk', './assets/bonus/pacman/sprites/pacman/pacman_walk.png', 32, 32);
+        this.load.spritesheet('pacman_death', './assets/bonus/pacman/sprites/pacman/pacman_death.png', 32, 32);
         this.load.image('pacman_life_counter', './assets/bonus/pacman/sprites/pacman/spr_lifecounter_0.png');
 
         // Ghosts
