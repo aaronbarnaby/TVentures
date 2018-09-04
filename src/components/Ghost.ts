@@ -15,9 +15,10 @@ export default class Ghost {
     
     sprite: Phaser.Sprite;
     
-    speed = 100;
-    scatterSpeed = 75;
+    speed = 75;
+    scatterSpeed = 90;
     frightenedSpeed = 50;
+    ghostDeadSpeed = 50;
     
     startDir: number = null;
     startPos: any = null;
@@ -31,6 +32,7 @@ export default class Ghost {
     scatterDestination: Phaser.Point;
     ghostDestination: Phaser.Point;
     
+    flag: boolean = null;
     turnTimer = 0;
     TURNING_COOLDOWN = 150;
     RETURNING_COOLDOWN = 100;
@@ -65,6 +67,8 @@ export default class Ghost {
             case 'blue':
             // Bottom-Right
             this.scatterDestination = new Phaser.Point(22 * this.gridSize, 17 * this.gridSize);
+            this.safeTiles = [this.state.safeTile];
+            this.mode = this.SCATTER;
             break;
             case 'red':
             // Bottom-Left
@@ -82,8 +86,10 @@ export default class Ghost {
         
         
         this.sprite = state.add.sprite((startPos.x * this.gridSize) + (this.gridSize / 2), (startPos.y * this.gridSize) + (this.gridSize / 2), `${this.name}_normal`, 0);
+        this.sprite.name = `${name}Ghost`;
         this.sprite.anchor.set(0.5);
-        this.sprite.angle = 0;
+        this.sprite.scale.setTo(0.85);
+
         state.physics.arcade.enable(this.sprite);
     }
     
@@ -114,12 +120,16 @@ export default class Ghost {
         if (this.math.fuzzyEqual((x * this.gridSize) + (this.gridSize / 2), this.sprite.x, 6) &&
         this.math.fuzzyEqual((y * this.gridSize) + (this.gridSize / 2), this.sprite.y, 6)) {
             // Update Grid Sensors
-            this.getAdjacentTiles(x, y);
+            this.directions[0] = this.state.map.getTile(x, y, this.state.map_layer);
+            this.directions[1] = this.state.map.getTileLeft(this.state.map_layer.index, x, y);
+            this.directions[2] = this.state.map.getTileRight(this.state.map_layer.index, x, y);
+            this.directions[3] = this.state.map.getTileAbove(this.state.map_layer.index, x, y);
+            this.directions[4] = this.state.map.getTileBelow(this.state.map_layer.index, x, y);
             
-            var canContinue = this.checkSafeTile(this.directions[this.currentDir].index);
+            var canContinue = (this.directions[this.currentDir] != null) ? this.checkSafeTile(this.directions[this.currentDir].index) : false;
             var possibleExits = [];
             for (var q = 1; q < this.directions.length; q++) {
-                if (this.checkSafeTile(this.directions[q].index) && q !== this.opposites[this.currentDir]) {
+                if ((this.directions[q] != null && this.checkSafeTile(this.directions[q].index)) && q !== this.opposites[this.currentDir]) {
                     possibleExits.push(q);
                 }
             }
@@ -144,8 +154,91 @@ export default class Ghost {
                     }
                     break;
                 case this.RETURNING_HOME:
+                    if (this.turnTimer < this.state.time.time) {
+                        this.sprite.body.reset(this.sprite.x, this.sprite.y);
+                        
+                        if (this.flag = this.flag ? false : true) {
+                            this.sprite.body.velocity.x = 0;
+                            if (this.sprite.y < 8 * this.gridSize) {
+                                this.sprite.body.velocity.y = this.ghostDeadSpeed;
+                                // this.sprite.animations.play("23"); // Eyes Down
+                            }
+
+                            if (this.sprite.y > 9 * this.gridSize) {
+                                this.sprite.body.velocity.y = -this.ghostDeadSpeed;
+                                // this.sprite.animations.play("22") // Eyes Up
+                            }
+                        } else {
+                            this.sprite.body.velocity.y = 0;
+                            if (this.sprite.x < 12 * this.gridSize) {
+                                this.sprite.body.velocity.x = this.ghostDeadSpeed;
+                                //this.sprite.animations.play("20"); // Eyes Right
+                            }
+                            if (this.sprite.x > 13 * this.gridSize) {
+                                this.sprite.body.velocity.x = -this.ghostDeadSpeed;
+                                //this.sprite.animations.play("21"); // Eyes Left
+                            }
+                        }
+                        this.turnTimer = this.state.time.time + this.RETURNING_COOLDOWN;
+                    }
+                    if (this.hasReachedHome()) {
+                        this.turnPoint.x = (x * this.gridSize) + (this.gridSize / 2);
+                        this.turnPoint.y = (y * this.gridSize) + (this.gridSize / 2);
+                        this.sprite.x = this.turnPoint.x;
+                        this.sprite.y = this.turnPoint.y;
+                        this.sprite.body.reset(this.turnPoint.x, this.turnPoint.y);
+                        this.mode = this.AT_HOME;
+                        this.state.gimeMeExitOrder(this);
+                    }
                     break;
                 case this.CHASE:
+                    if (this.turnTimer < this.state.time.time) {
+                        var distanceToObj = 999999;
+                        var direction, decision, bestDecision;
+                        for (var q = 0; q < possibleExits.length; q++) {
+                            direction = possibleExits[q];
+
+                            switch (direction) {
+                                case Phaser.LEFT:
+                                    decision = new Phaser.Point((x - 1) * this.gridSize + (this.gridSize / 2), (y * this.gridSize) + (this.gridSize / 2));
+                                    break;
+                                case Phaser.RIGHT:
+                                    decision = new Phaser.Point((x + 1) * this.gridSize + (this.gridSize / 2), (y * this.gridSize) + (this.gridSize / 2));
+                                    break;
+                                case Phaser.UP:
+                                    decision = new Phaser.Point(x * this.gridSize + (this.gridSize / 2), ((y - 1) * this.gridSize) + (this.gridSize / 2));
+                                    break;
+                                case Phaser.DOWN:
+                                    decision = new Phaser.Point(x * this.gridSize + (this.gridSize / 2),  ((y + 1) * this.gridSize) + (this.gridSize / 2));
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            var dist = this.ghostDestination.distance(decision);
+                            if (dist < distanceToObj) {
+                                bestDecision = direction;
+                                distanceToObj = dist;
+                            }
+                        }
+
+                        // if (this.state.isSpecialTile({ x: x, y: y }) && bestDecision === Phaser.UP) {
+                        //     bestDecision = this.currentDir;
+                        // }
+
+                        this.turnPoint.x = (x * this.gridSize) + (this.gridSize / 2);
+                        this.turnPoint.y = (y * this.gridSize) + (this.gridSize / 2);
+
+                        this.sprite.x = this.turnPoint.x;
+                        this.sprite.y = this.turnPoint.y;
+
+                        this.lastPos = { x: x, y: y };
+
+                        this.sprite.body.reset(this.turnPoint.x, this.turnPoint.y);
+                        this.move(bestDecision);
+
+                        this.turnTimer = this.state.time.time + this.TURNING_COOLDOWN;
+                    }
                     break;
                 case this.AT_HOME:
                     if (!canContinue) {
@@ -184,7 +277,13 @@ export default class Ghost {
                         this.sprite.body.reset(this.turnPoint.x, this.turnPoint.y);
                         var dir = (this.currentDir === Phaser.LEFT) ? Phaser.RIGHT : Phaser.LEFT;
                         this.move(dir);
-                    } 
+                    } else {
+                        this.move(this.currentDir);
+                    }
+                    break;
+                case this.SCATTER:
+                    this.ghostDestination = new Phaser.Point(this.scatterDestination.x, this.scatterDestination.y);
+                    this.mode = this.CHASE;
                     break;
                 case this.STOP:
                     this.move(Phaser.NONE);
@@ -197,6 +296,18 @@ export default class Ghost {
         this.currentDir = dir;
 
         var speed = this.speed;
+        if (this.state.getCurrentMode() === this.SCATTER) {
+            speed = this.scatterSpeed;
+        }
+
+        if (this.mode === this.RANDOM) {
+            speed = this.frightenedSpeed;
+        } else if (this.mode === this.RETURNING_HOME) {
+            speed = this.ghostDeadSpeed;
+            // this.sprite.animations.play((dir+20).toString()); // Eyes
+        } else {
+            // this.sprite.animations.play(dir.toString());
+        }
 
         if (this.currentDir === Phaser.NONE) {
             this.sprite.body.velocity.x = this.sprite.body.velocity.y = 0;
@@ -233,27 +344,13 @@ export default class Ghost {
             }
         }
     }
-    
-    setNormal() {
-        this.sprite.loadTexture(`${this.name}_normal`, 0);
-    }
-    
-    setAfraid() {
-        this.sprite.loadTexture(`${this.name}_afraid`, 0);
-        this.sprite.animations.add(`${this.name}_afraid`, null, 2, true);
-        this.sprite.play(`${this.name}_afraid`);
-    }
-    
-    setSpeed(speed) {
-        this.speed = speed;
-    }
 
-    getAdjacentTiles(x, y) {
-        this.directions[0] = this.state.map.getTile(x, y, this.state.map_layer);
-        this.directions[1] = this.state.map.getTileLeft(this.state.map_layer.index, x, y);
-        this.directions[2] = this.state.map.getTileRight(this.state.map_layer.index, x, y);
-        this.directions[3] = this.state.map.getTileAbove(this.state.map_layer.index, x, y);
-        this.directions[4] = this.state.map.getTileBelow(this.state.map_layer.index, x, y);
+    enterFrightenedMode() {
+        if (this.mode !== this.AT_HOME && this.mode !== this.EXIT_HOME && this.mode !== this.RETURNING_HOME) {
+            // this.sprite.play("frightened");
+            this.mode = this.RANDOM;
+            this.isAttacking = false;
+        }
     }
     
     checkSafeTile(tileIndex) {
@@ -264,46 +361,65 @@ export default class Ghost {
         }
         return false;
     }
+
+    resetSafeTiles() {
+        this.safeTiles = [this.state.safeTile, 19, 20];
+    }
     
     getGhostDestination() {
         switch (this.color) {
             case 'blue':
-            return this.state.pacman.getPosition();
+                return this.state.pacman.getPosition();
             case 'red':
-            break;
+                var pacmanPos = this.state.pacman.getPosition();
+                var blueGhostPos = this.state.blueGhost.getPosition();
+                var diff = Phaser.Point.subtract(pacmanPos, blueGhostPos);
+                var dest: any = Phaser.Point.add(pacmanPos, diff);
+                if (dest.x < this.gridSize / 2) dest.x = this.gridSize / 2;
+                if (dest.x > this.state.map.widthInPixels - this.gridSize / 2) dest.x = this.state.map.widthInPixels - this.gridSize / 2;
+                if (dest.y < this.gridSize / 2) dest.y = this.gridSize / 2;
+                if (dest.y > this.state.map.heightInPixels - this.gridSize / 2) dest.y = this.state.map.heightInPixels - this.gridSize / 2;
+                return dest;
+                break;
             case 'orange':
-            var pacmanPos = this.state.pacman.getPosition();
-            var myPos = this.getPosition();
-            if (myPos.distance(pacmanPos) > 8 * this.gridSize) {
-                return pacmanPos;
-            }
-            break;
+                var pacmanPos = this.state.pacman.getPosition();
+                var myPos = this.getPosition();
+                if (myPos.distance(pacmanPos) > 8 * this.gridSize) {
+                    return pacmanPos;
+                } else {
+                    return new Phaser.Point(this.scatterDestination.x, this.scatterDestination.y);
+                }
+                break;
             case 'pink':
-            var dest = this.state.pacman.getPosition();
-            var dir = this.state.pacman.getCurrentDirection();
-            var offsetX = 0, offsetY = 0;
-            
-            if (dir === Phaser.LEFT || dir === Phaser.RIGHT) {
-                offsetX = (dir === Phaser.RIGHT) ? -4 : 4;
-            }
-            
-            if (dir === Phaser.UP || dir === Phaser.DOWN) {
-                offsetY = (dir === Phaser.DOWN) ? -4 : 4;
-            }
-            
-            offsetX *= this.gridSize;
-            offsetY *= this.gridSize;
-            dest.x -= offsetX;
-            dest.y -= offsetY;
-            
-            if (dest.x < this.gridSize / 2) dest.x = this.gridSize / 2;
-            if (dest.x > this.state.map.widthInPixels - this.gridSize / 2) dest.x = this.state.map.widthInPixels - this.gridSize / 2;
-            if (dest.y < this.gridSize / 2) dest.y = this.gridSize / 2;
-            if (dest.y > this.state.map.heightInPixels - this.gridSize / 2) dest.y = this.state.map.heightInPixels - this.gridSize / 2;
-            return dest;
+                var dest: any = this.state.pacman.getPosition();
+                var dir = this.state.pacman.getCurrentDirection();
+                var offsetX = 0, offsetY = 0;
+                if (dir === Phaser.LEFT || dir === Phaser.RIGHT) {
+                    offsetX = (dir === Phaser.RIGHT) ? -4 : 4;
+                }
+                if (dir === Phaser.UP || dir === Phaser.DOWN) {
+                    offsetY = (dir === Phaser.DOWN) ? -4 : 4;
+                }
+                offsetX *= this.gridSize;
+                offsetY *= this.gridSize;
+                dest.x -= offsetX;
+                dest.y -= offsetY;
+                if (dest.x < this.gridSize / 2) dest.x = this.gridSize / 2;
+                if (dest.x > this.state.map.widthInPixels - this.gridSize / 2) dest.x = this.state.map.widthInPixels - this.gridSize / 2;
+                if (dest.y < this.gridSize / 2) dest.y = this.gridSize / 2;
+                if (dest.y > this.state.map.heightInPixels - this.gridSize / 2) dest.y = this.state.map.heightInPixels - this.gridSize / 2;
+                return dest;
         }
         
         return new Phaser.Point(this.scatterDestination.x, this.scatterDestination.y);
+    }
+
+    hasReachedHome() {
+        if (this.sprite.x < 11 * this.gridSize || this.sprite.x > 13 * this.gridSize || 
+            this.sprite.y < 8 * this.gridSize || this.sprite.y > 9 * this.gridSize) {
+            return false;
+        }
+        return true;
     }
     
     getPosition() {
