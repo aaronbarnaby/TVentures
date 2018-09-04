@@ -14,7 +14,7 @@ export let Globals: IGlobals = {
         charactors: null,
         textManager: new TextManager()
     },
-    hasSound: false,
+    hasSound: true,
 };
 
 interface IGlobals {

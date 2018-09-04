@@ -141,18 +141,16 @@ export default class Pacman {
 
         dot.kill();
         this.state.score += this.state.values.dot;
-        this.state.updateScore();
     }
 
     eatPill(pacman: Pacman, pill: Phaser.Group) {
         pill.kill();
 
         // Start Ghost Scared Mode
-        this.state.ghostScatter();
-        this.state.time.events.add(7000, this.state.ghostNormal, this);
+        // this.state.ghostScatter();
+        // this.state.time.events.add(7000, this.state.ghostNormal, this);
 
         this.state.score += this.state.values.pill;
-        this.state.updateScore();
     }
 
     // Private 

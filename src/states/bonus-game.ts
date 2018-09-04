@@ -41,6 +41,24 @@ export default class BonusGameState extends Phaser.State {
     ghostGroup: Phaser.Group = null;
     ghostMovementInterval: any = null;    
 
+    TIME_MODES: any = [
+        { mode: "scatter", time: 7000 },
+        { mode: "chase", time: 20000 },
+        { mode: "scatter", time: 7000 },
+        { mode: "chase", time: 20000 },
+        { mode: "scatter", time: 5000 },
+        { mode: "chase", time: 20000 },
+        { mode: "scatter", time: 5000 },
+        { mode: "chase", time: -1 }
+    ];
+
+    changeModeTimer: number = 0;
+    remainingTime: number = 0;
+    currentMode: number = 0;
+
+    isFrightened = false;
+    FRIGHTENED_MODE_TIME = 7000;
+
     create() {
         // Map
         this.map = this.add.tilemap('map');
@@ -69,13 +87,17 @@ export default class BonusGameState extends Phaser.State {
         this.pills.setAll('x', 9, false, false, 1);
         this.pills.setAll('y', 7, false, false, 1);
 
-        //this.map.setCollision(1, true, this.wall_layer);
         this.map.setCollisionByExclusion([this.safeTile], true, this.map_layer);
 
         this.cursors = this.input.keyboard.createCursorKeys();
 
         // Pacman
         this.pacman = new Pacman(this);
+
+        // Score Text
+        this.scoreText = this.add.text(35, 22, `Score: ${this.score}`, { fill: '#FFFFFF' });
+
+        this.changeModeTimer = this.time.time + this.TIME_MODES[this.currentMode].time;
 
         // Ghosts
         this.ghosts.push(new Ghost(this, 'blue', { x: 12,  y: 8 }, Phaser.LEFT));
@@ -88,64 +110,145 @@ export default class BonusGameState extends Phaser.State {
             this.ghostGroup.add(ghost.sprite);
         });
 
-        this.scoreText = this.add.text(35, 22, `Score: ${this.score}`, { fill: '#FFFFFF' });
-
         if (Globals.hasSound) {
             this.game.sound.play('pacman_beginning');
         }
-    }
 
-    runSound: Phaser.Sound = null;
-    ghostScatter() {
-        _.forEach(this.ghosts, (ghost) => {
-            ghost.setAfraid();
-        });
-
-        this.runSound = this.game.sound.play('pacman_ghostrun', 1, true);
-    }
-
-    ghostNormal() {
-        _.forEach(this.ghosts, (ghost) => {
-            ghost.setNormal();
-        });
-
-        this.runSound.stop();
-    }
-
-    dead(pacman: Phaser.Sprite, ghost: Ghost) {
-        pacman.kill();
-
-        // TODO: Death Animation and better death screen + lives?
-        this.add.text(140, 300, "You died! Good luck next time...", {fill: 'white', backgroundColor: 'black'});
-        this.add.text(150, 330, "Refresh to restart the game.", {fill: 'white', backgroundColor: 'black'});
-    }
-
-    stopGhost(ghost: Phaser.Sprite, wall: any) {
-        _.forEach(this.ghosts, (i) => {
-            if (i.sprite == ghost) {
-                //i.turnDirection = "NONE";
-                i.currentDir = Phaser.NONE;
-            }
-        });
-    }
-
-    updateScore() {
-        this.scoreText.setText(`Score: ${this.score}`);
+        this.time.events.add(4000, () => {
+            this.sendExitOrder(this.ghosts[0]);
+        }, this);
     }
 
     update() {
-        if (this.dots.countLiving() > 0) {
-            //this.physics.arcade.collide(this.ghostGroup, this.wall_layer, this.stopGhost, null, this);
-            //this.physics.arcade.collide(this.pacman.sprite, this.ghostGroup, this.dead, null, this);
-            
-            this.pacman.update();
+        this.scoreText.text = `Score: ${this.score}`;
+
+        if (!this.pacman.isDead) {
             _.forEach(this.ghosts, (ghost) => {
-                ghost.update();
+                if (ghost.mode !== ghost.RETURNING_HOME) {
+                    this.physics.arcade.overlap(this.pacman.sprite, ghost.sprite, this.eatGhost, null, this);
+                }
             });
-        } else {
-            // TODO: Better Complete Screen
-            this.add.text(300, 150, "Congratulations !", {fill: 'white', backgroundColor: 'black'});
-            this.add.text(230, 180, "Refresh to restart the game.", {fill: 'white', backgroundColor: 'black'});
+
+            if (this.changeModeTimer !== -1 && !this.isFrightened && this.changeModeTimer < this.time.time) {
+                this.currentMode++;
+                if (this.TIME_MODES[this.currentMode].time == -1) {
+                    this.changeModeTimer = -1;
+                } else {
+                    this.changeModeTimer = this.time.time + this.TIME_MODES[this.currentMode].time;
+                }
+
+                if (this.TIME_MODES[this.currentMode].mode === "chase") {
+                    this.sendAttackOrder();
+                } else {
+                    this.sendScatterOrder();
+                }
+            }
+
+            if (this.isFrightened && this.changeModeTimer < this.time.time) {
+                this.changeModeTimer = this.time.time + this.remainingTime;
+                this.isFrightened = false;
+
+                if (this.TIME_MODES[this.currentMode].mode === "chase") {
+                    this.sendAttackOrder();
+                } else {
+                    this.sendScatterOrder();
+                }
+            }
         }
+
+        this.pacman.update();
+        this.updateGhosts();
+
+        //this.checkKeys();
+
+        // if (this.dots.countLiving() > 0) {
+        //     this.pacman.update();
+        //     _.forEach(this.ghosts, (ghost) => {
+        //         ghost.update();
+        //     });
+        // } else {
+        //     // TODO: Better Complete Screen
+        //     this.add.text(300, 150, "Congratulations !", {fill: 'white', backgroundColor: 'black'});
+        //     this.add.text(230, 180, "Refresh to restart the game.", {fill: 'white', backgroundColor: 'black'});
+        // }
+    }
+
+    getCurrentMode() {
+        if (!this.isFrightened) {
+            if (this.TIME_MODES[this.currentMode].mode === "scatter") {
+                return "scatter";
+            } else {
+                return "chase";
+            }
+        } else {
+            return "random";
+        }
+    }
+
+    gimeMeExitOrder(ghost) {
+        this.game.time.events.add(Math.random() * 3000, this.sendExitOrder, this, ghost);
+    }
+
+    sendExitOrder(ghost) {
+        ghost.mode = ghost.EXIT_HOME;
+    }
+
+    sendAttackOrder() {
+        _.forEach(this.ghosts, (ghost) => {
+            ghost.attack();
+        });
+    }
+
+    sendScatterOrder() {
+        _.forEach(this.ghosts, (ghost) => {
+            ghost.scatter();
+        });
+    }
+
+    // runSound: Phaser.Sound = null;
+    // ghostScatter() {
+    //     _.forEach(this.ghosts, (ghost) => {
+    //         ghost.setAfraid();
+    //     });
+
+    //     this.runSound = this.game.sound.play('pacman_ghostrun', 1, true);
+    // }
+
+    // ghostNormal() {
+    //     _.forEach(this.ghosts, (ghost) => {
+    //         ghost.setNormal();
+    //     });
+
+    //     this.runSound.stop();
+    // }
+
+    eatGhost(pacman, ghost) {
+        if (this.isFrightened) {
+            ghost.kill(); // Replace with Below
+            // Return Target Ghost to Home
+            // this[ghost.name].mode = this[ghost.name].RETURNING_HOME;
+            // this[ghost.name].ghostDestination = new Phaser.Point(12 * this.gridSize, 8 * this.gridSize);
+            // this[ghost.name].resetSafeTiles();
+            // this.score += 10;
+        } else {
+            this.killPacman();
+        }
+    }
+
+    killPacman() {
+        this.pacman.isDead = true;
+        this.stopGhosts();
+    }
+
+    updateGhosts() {
+        _.forEach(this.ghosts, (ghost) => {
+            ghost.update();
+        });
+    }
+
+    stopGhosts() {
+        _.forEach(this.ghosts, (ghost) => {
+            ghost.mode = ghost.STOP;
+        });
     }
 }

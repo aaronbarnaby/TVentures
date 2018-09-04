@@ -52,8 +52,8 @@ export default class BonusLoadingState extends Phaser.State {
     loadGhost(color) {
         var name = 'ghost_' + color;
         var spritesheets = {
-			afraid: {name: name + '_' + 'afraid', path: './assets/bonus/pacman/sprites/ghost/ghost_afraid.png'},
-			normal: {name: name + '_' + 'normal', path: './assets/bonus/pacman/sprites/ghost/spr_ghost_' + color + '_0.png'},
+			afraid: {name: name + '_' + 'afraid', path: './assets/bonus/pacman/ghost/ghost_afraid.png'},
+			normal: {name: name + '_' + 'normal', path: './assets/bonus/pacman/ghost/spr_ghost_' + color + '_0.png'},
         };
         
         this.load.spritesheet(spritesheets.afraid.name, spritesheets.afraid.path, 32, 32);

@@ -23,14 +23,10 @@ export default class Ghost {
     startPos: any = null;
     lastPos: any = null;
     
-    //directions = { up: 'UP', down: 'DOWN', right: 'RIGHT', left: 'LEFT', none: 'NONE' };
     directions = [ null, null, null, null, null ];
     opposites = [ Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP ];
     currentDir: number = Phaser.NONE;
-    
-    //adjacentTiles: any = {};
     turnPoint: any = {};
-    //turnDirection = this.directions.none;
     
     scatterDestination: Phaser.Point;
     ghostDestination: Phaser.Point;
@@ -178,7 +174,7 @@ export default class Ghost {
                         this.sprite.x = this.turnPoint.x;
                         this.sprite.y = this.turnPoint.y;
                         this.sprite.body.reset(this.turnPoint.x, this.turnPoint.y);  
-                        this.mode = 'random'; // TODO: Load Current Mode
+                        this.mode = this.state.getCurrentMode();
                         return;
                     } else if (!canContinue) {
                         this.turnPoint.x = (x * this.gridSize) + (this.gridSize / 2);
@@ -217,6 +213,26 @@ export default class Ghost {
             this.sprite.body.velocity.y = speed;
         }
     }
+
+    attack() {
+        if (this.mode !== this.RETURNING_HOME) {
+            this.isAttacking = true;
+            //this.sprite.animations.play(this.currentDir.toString());
+            if (this.mode !== this.AT_HOME && this.mode != this.EXIT_HOME) {
+                this.currentDir = this.opposites[this.currentDir];
+            }
+        }
+    }
+
+    scatter() {
+        if (this.mode !== this.RETURNING_HOME) {
+            //this.sprite.animations.play(this.currentDir.toString());
+            this.isAttacking = false;
+            if (this.mode !== this.AT_HOME && this.mode != this.EXIT_HOME) {
+                this.mode = this.SCATTER;
+            }
+        }
+    }
     
     setNormal() {
         this.sprite.loadTexture(`${this.name}_normal`, 0);
@@ -247,25 +263,6 @@ export default class Ghost {
             }
         }
         return false;
-    }
-
-    checkDirection(direction) {
-        if (this.currentDir == direction || this.directions[direction] == null || this.directions[direction].collides) {
-            return
-        }
-        
-        this.turnPoint.x = (this.lastPos.x * this.gridSize) + (this.gridSize / 2);
-        this.turnPoint.y = (this.lastPos.y * this.gridSize) + (this.gridSize / 2);
-        
-        if (this.math.fuzzyEqual(this.sprite.x, this.turnPoint.x, 6) || this.math.fuzzyEqual(this.sprite.y, this.turnPoint.y, 6)) {
-            this.currentDir = direction;
-            this.sprite.x = this.turnPoint.x;
-            this.sprite.y = this.turnPoint.y;
-            
-            this.sprite.body.reset(this.turnPoint.x, this.turnPoint.y);
-            
-            this.move(direction);
-        }
     }
     
     getGhostDestination() {
