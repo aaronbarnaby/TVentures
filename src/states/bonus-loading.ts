@@ -23,19 +23,20 @@ export default class BonusLoadingState extends Phaser.State {
         this.load.audio('pacman_ghostrun', './assets/bonus/pacman/sounds/pacman_ghostrun.wav', true);
 
         // Map
-        this.load.tilemap('map', './assets/bonus/pacman/maps/map_pacman.json', null, Phaser.Tilemap.TILED_JSON);
-        this.load.image('tile', './assets/bonus/pacman/maps/tile.png');
-        this.load.image('safetile', './assets/bonus/pacman/maps/safetile.png');
+        this.load.tilemap('map', './assets/bonus/pacman/map_pacman.json', null, Phaser.Tilemap.TILED_JSON);
+        this.load.spritesheet('pacman_tiles', './assets/bonus/pacman/Pacman.png', 32, 32);
+        //this.load.image('tile', './assets/bonus/pacman/maps/tile.png');
+        //this.load.image('safetile', './assets/bonus/pacman/maps/safetile.png');
         
         // Items
-        this.load.image('dot', './assets/bonus/pacman/sprites/pills/spr_dot_0.png');
-        this.load.image('pill', './assets/bonus/pacman/sprites/pills/spr_pill_0.png');
-        this.load.image('cherry', './assets/bonus/pacman/sprites/cherry/spr_cherry_0.png');
+        this.load.image('dot', './assets/bonus/pacman/dot.png');
+        this.load.image('pill', './assets/bonus/pacman/pills/spr_pill_0.png');
+        this.load.image('cherry', './assets/bonus/pacman/cherry/spr_cherry_0.png');
         
         // Pacman
-        this.load.spritesheet('pacman_walk', './assets/bonus/pacman/sprites/pacman/pacman_walk.png', 32, 32);
-        this.load.spritesheet('pacman_death', './assets/bonus/pacman/sprites/pacman/pacman_death.png', 32, 32);
-        this.load.image('pacman_life_counter', './assets/bonus/pacman/sprites/pacman/spr_lifecounter_0.png');
+        this.load.spritesheet('pacman_walk', './assets/bonus/pacman/pacman/pacman_walk.png', 32, 32);
+        this.load.spritesheet('pacman_death', './assets/bonus/pacman/pacman/pacman_death.png', 32, 32);
+        this.load.image('pacman_life_counter', './assets/bonus/pacman/pacman/spr_lifecounter_0.png');
 
         // Ghosts
         this.loadGhost('blue');

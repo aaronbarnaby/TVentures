@@ -10,10 +10,13 @@ export default class BonusGameState extends Phaser.State {
     map: Phaser.Tilemap = null;
     gridSize = 32;
 
+    map_layer: Phaser.TilemapLayer = null;
     wall_layer: Phaser.TilemapLayer = null;
-    home_layer: Phaser.TilemapLayer = null;
+    safe_layer: Phaser.TilemapLayer = null;
     dots_layer: Phaser.TilemapLayer = null;
     pills_layer: Phaser.TilemapLayer = null;
+
+    safeTile = 1;
 
     dots: Phaser.Group = null
     numDots: number = 0;
@@ -41,17 +44,17 @@ export default class BonusGameState extends Phaser.State {
     create() {
         // Map
         this.map = this.add.tilemap('map');
-        this.map.addTilesetImage('tile', 'tile');
-        this.map.addTilesetImage('safetile', 'safetile');
+        this.map.addTilesetImage('pacman', 'pacman_tiles');
 
+        this.map_layer = this.map.createLayer('map');
         this.wall_layer = this.map.createLayer('walls');
-        this.home_layer = this.map.createLayer('home');
+        this.safe_layer = this.map.createLayer('safe');
         this.dots_layer = this.map.createLayer('dots');
         this.pills_layer = this.map.createLayer('pills');
 
         // Dots
         this.dots = this.add.physicsGroup();
-        this.numDots = this.map.createFromTiles(2, null, 'dot', this.dots_layer, this.dots);
+        this.numDots = this.map.createFromTiles(14, this.safeTile, 'dot', this.dots_layer, this.dots);
         this.totalDots = this.numDots;
 
         // Center Dots
@@ -60,13 +63,14 @@ export default class BonusGameState extends Phaser.State {
 
         // Pills
         this.pills = this.add.physicsGroup();
-        this.numPills = this.map.createFromTiles(2, null, 'pill', this.pills_layer, this.pills);
+        this.numPills = this.map.createFromTiles(15, this.safeTile, 'pill', this.pills_layer, this.pills);
 
         // Center Pills
         this.pills.setAll('x', 9, false, false, 1);
         this.pills.setAll('y', 7, false, false, 1);
 
-        this.map.setCollision(1, true, this.wall_layer);
+        //this.map.setCollision(1, true, this.wall_layer);
+        this.map.setCollisionByExclusion([this.safeTile], true, this.map_layer);
 
         this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -74,10 +78,10 @@ export default class BonusGameState extends Phaser.State {
         this.pacman = new Pacman(this);
 
         // Ghosts
-        this.ghosts.push(new Ghost(this, 'blue', { x: 12,  y: 8 }, null));
-        this.ghosts.push(new Ghost(this, 'red', { x: 11,  y: 8 }, null));
-        this.ghosts.push(new Ghost(this, 'orange', { x: 12,  y: 8 }, null));
-        this.ghosts.push(new Ghost(this, 'pink', { x: 13,  y: 8 }, null));
+        this.ghosts.push(new Ghost(this, 'blue', { x: 12,  y: 8 }, Phaser.LEFT));
+        this.ghosts.push(new Ghost(this, 'red', { x: 11,  y: 8 }, Phaser.RIGHT));
+        this.ghosts.push(new Ghost(this, 'orange', { x: 12,  y: 8 }, Phaser.RIGHT));
+        this.ghosts.push(new Ghost(this, 'pink', { x: 13,  y: 8 }, Phaser.LEFT));
 
         this.ghostGroup = this.add.physicsGroup();
         _.forEach(this.ghosts, (ghost) => {
@@ -89,27 +93,6 @@ export default class BonusGameState extends Phaser.State {
         if (Globals.hasSound) {
             this.game.sound.play('pacman_beginning');
         }
-    }
-
-    eatDot(pacman: Pacman, dot: Phaser.Group) {
-        if (Globals.hasSound) {
-            this.game.sound.play('pacman_eatpill');
-        }
-
-        dot.kill();
-        this.score += this.values.dot;
-        this.updateScore();
-    }
-
-    eatPill(pacman: Pacman, pill: Phaser.Group) {
-        pill.kill();
-
-        // Start Ghost Scared Mode
-        this.ghostScatter();
-        this.game.time.events.add(7000, this.ghostNormal, this);
-
-        this.score += this.values.pill;
-        this.updateScore();
     }
 
     runSound: Phaser.Sound = null;
@@ -152,23 +135,17 @@ export default class BonusGameState extends Phaser.State {
 
     update() {
         if (this.dots.countLiving() > 0) {
-            // Collision Handling
-            this.physics.arcade.collide(this.pacman.sprite, this.wall_layer);
-            this.physics.arcade.overlap(this.pacman.sprite, this.dots, this.eatDot, null, this);
-            this.physics.arcade.overlap(this.pacman.sprite, this.pills, this.eatPill, null, this);
-
-            this.physics.arcade.collide(this.ghostGroup, this.wall_layer, this.stopGhost, null, this);
-            this.physics.arcade.collide(this.pacman.sprite, this.ghostGroup, this.dead, null, this);
+            //this.physics.arcade.collide(this.ghostGroup, this.wall_layer, this.stopGhost, null, this);
+            //this.physics.arcade.collide(this.pacman.sprite, this.ghostGroup, this.dead, null, this);
             
-
             this.pacman.update();
             _.forEach(this.ghosts, (ghost) => {
                 ghost.update();
             });
         } else {
             // TODO: Better Complete Screen
-            this.add.text(220, 300, "Congratulations !", {fill: 'white', backgroundColor: 'black'});
-            this.add.text(150, 330, "Refresh to restart the game.", {fill: 'white', backgroundColor: 'black'});
+            this.add.text(300, 150, "Congratulations !", {fill: 'white', backgroundColor: 'black'});
+            this.add.text(230, 180, "Refresh to restart the game.", {fill: 'white', backgroundColor: 'black'});
         }
     }
 }

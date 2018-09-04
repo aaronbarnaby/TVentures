@@ -1,4 +1,5 @@
 import BonusGameState from "../states/bonus-game";
+import { Globals } from "../globals";
 
 export default class Pacman {
 
@@ -21,6 +22,8 @@ export default class Pacman {
     adjacentTiles = {};
     turning: any = null;
     turnPoint: any = {};
+
+    isDead = false;
 
     constructor(state: BonusGameState) {
         this.state = state;
@@ -121,8 +124,35 @@ export default class Pacman {
     }
 
     update() {
+        if (!this.isDead) {
+            this.state.physics.arcade.collide(this.sprite, this.state.map_layer);
+            this.state.physics.arcade.overlap(this.sprite, this.state.dots, this.eatDot, null, this);
+            this.state.physics.arcade.overlap(this.sprite, this.state.pills, this.eatPill, null, this);
+        }
+
         this.getAdjacentTiles();
         this.handleInput();
+    }
+
+    eatDot(pacman: Pacman, dot: Phaser.Group) {
+        if (Globals.hasSound) {
+            this.state.sound.play('pacman_eatpill');
+        }
+
+        dot.kill();
+        this.state.score += this.state.values.dot;
+        this.state.updateScore();
+    }
+
+    eatPill(pacman: Pacman, pill: Phaser.Group) {
+        pill.kill();
+
+        // Start Ghost Scared Mode
+        this.state.ghostScatter();
+        this.state.time.events.add(7000, this.state.ghostNormal, this);
+
+        this.state.score += this.state.values.pill;
+        this.state.updateScore();
     }
 
     // Private 
