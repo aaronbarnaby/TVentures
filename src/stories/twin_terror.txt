@@ -1,37 +1,193 @@
 [0]
-You wake up and find yourself in the pitch black, after pushing yourself to your feet you notice a porch light in the distance.\n\n
-As you walk up to the house you notice that all the curtains are closed and you have no way to tell if anyone is home, however the front door is slightly open.
+You wake up and find yourself in the pitch black, after pushing yourself to your feet you notice a porch light in the distance.\n\nAs you walk up to the house you notice that all the curtains are closed and you have no way to tell if anyone is home, however, the front door is slightly open.
 
 - Enter House [1]
 - Leave [E1]
 
 [E1]
-You decide you want to part of whatever is in that house, you turn away and start the walk down the road.\n\n\n\n
-THE END.
+You decide you want to part of whatever is in that house, you turn away and start the walk down the road.\n\n\n\nTHE END.
 
 [1]
-[AUDIO = kids-laughing-then-crying, SINGLE]
-As you enter the house you hear the sound of children playing and laughing, It seems to be coming from upstairs.\n\n
-After a short while the laughing stops and you hear a cry to the point of screaming from a girl.\n\n
-As you look around the room you entered you notice the stairs directly in front of you as well as two doors, One to the left and one right.
+[AUDIO kids-laughing-then-crying, SINGLE]
+As you enter the house you hear the sound of children playing and laughing, It seems to be coming from upstairs.\n\nAfter a short while, the laughing stops and you hear a cry to the point of screaming from a girl.\n\nAs you look around the room you entered you notice the stairs directly in front of you as well as two doors, One to the left and one right.
 
 - Head upstairs towards the sounds that you heard. [2]
-- Enter the door on the left [2B]
-- Enter the door on the right [3C]
+- Enter the door on the left [1A]
+- Enter the door on the right [1B]
 - Exit the house [D1]
 
 [D1]
-[AUDIO = monster-coming, SINGLE][AUDIO = outside-run, LOOP]
-As you turn to leave the house you hear a large thumping, faster and faster.\n\n
-You dare not turn around to look so you just start running.
+[AUDIO monster-roar, SINGLE][DELAY 2sec][AUDIO monster-coming, SINGLE]
+                            [DELAY 1sec][AUDIO outside-run, SINGLE]
+As you turn to leave the house you hear a large thumping, faster and faster.\n\nYou dare not turn around to look so you just start running.
 
-- Continue [D1-1]
+- Continue [D0]
 
-[D1-1]
-Before you have time to react you feel a sharp pain in your chest.\n\n
-You look down and see a spike like claw that seems to have impaled you.\n\n\n
-Before you know it you fall flat on the ground and everything goes black.\n\n\n\n
-GAME OVER
+[D0]
+Before you have time to react you feel a sharp pain in your chest.\n\nYou look down and see a claw that seems to have impaled you.\n\n\nBefore you know it you fall flat on the ground and everything goes black.\n\n\n\nGAME OVER
 
 - Start Again [0]
 - Return To Menu [>Menu]
+
+[2]
+[AUDIO girl-crying, LOOP]
+You walk upstairs towards the crying, it's getting darker as you walk upstairs.\n\nOnce you reach the top you notice a long corridor in front of you, you can't see the end as it's completely black in darkness.\n\nLooking down the hallway you can see 3 doors, the first door to the left has a sign on it saying Archie's room there is a light you notice in the crack under the door.  Down the right side the first door has a sign saying Lily's room there is also light from under the door and also you can hear the crying girl inside. The last door you see on the right has no light but you notice the door slightly open.
+
+- Continue towards the crying and enter Lily's room (First Right) [2A]
+- Enter Archie's Room (First Right) [2B]
+- Enter the second door on the right which is slightly open [2C]
+- Walk to the end of the corridor [3]
+- Go back downstairs [D2]
+
+[D2]
+[DELAY, 2sec][AUDIO floor-creak, SINGLE][DELAY, 1sec][AUDIO monster-roar, SINGLE][DELAY 2sec][AUDIO monster-coming, SINGLE]
+As you walk down the stairs the floor below creaks you pause for a moment until you hear a loud roar.You begin to run as fast as you can straight to the front door but it's locked.
+
+- Kick Door Open [D0]
+- Find Another Exit [D0A]
+
+[D0A]
+[DELAY 2sec][AUDIO monster-growl, SINGLE]
+As you turn around you see a large dark figure standing directly in front of you, it pulls its long claw-like arm back and then swiftly forwards straight into your chest.  You move your arms towards the figure and as you do it quickly opens it's mouth and with huge sharp white teeth grabs onto one of your hands and rips it straight off. You then fall back flat on your back and as the figure looms over you your eyes begin to close falling to black.\n\n\n\nGAME OVER
+
+- Start Again [0]
+- Return To Menu [>Menu]
+
+[2A]
+You walk into the room with the girl crying, as you do the crying stops and you notice a little girl sad in the middle of the room staring at you with tears falling down her face.
+
+- Sit next to and talk to the girl [2A1]
+- Look around the room [2A2]
+- Leave Room [2A3]
+
+[2A1]
+Guessing the girls' name is Lily because of the sign you saw on the door you sit down next to the girl and start talking.\n\n"Hi Lily, What's Wrong?".  To which she replies "Oh! I want Oh!".
+
+- "What is Oh?" [2A1-1]
+- Give (color wrongOh) Oh [-ITEM wrongOh][2A1-3]  (IF ITEMS == wrongOh)
+- Give Pink Oh [-ITEM pinkOh][2A1-4]  (IF ITEMS == pinkOh)
+- Stop talking to girl [2A]
+
+[2A1-1]
+She replies "Oh! I want my Oh!".
+
+- "Where is Oh?" [2A1-2]
+- Stop talking to girl [2A]
+
+[2A1-2]
+She replies "Archie!, Archie took Oh!"
+
+- Stop talking to girl [2A]
+
+[2A1-3]
+You hand lily the (wrongOh color) Oh and she throws it to the side and says "LILY DON'T WANT (color) Oh! LILY WANTS' PINK OH!)
+
+- Stop talking to girl [2A]
+
+[2A1-4]
+As soon as you pull out the pink oh to hand the the girl her hands strech out towards you and with a huge smile she starts squeeling with happyness.
+
+- Stop talking to girl [2A]
+
+[2A2]
+You start to look around the room.\n\n\n\n(roll dice to indicate your searching skill)
+
+- Roll Dice For Search [>ROLL > 2A2-R1 - 2A2-R2 - 2A2-R3]
+
+[2A2-R1]
+You have always been bad at finding stuff, however you take a look around and see a toybox on the floor and a shelf with some cuddly toys on.
+
+- Look in box [2A2-R-A]
+- Check toys on shelf [2A2-R-B]
+
+[2A2-R2]
+You feel that your ok at finding stuff, you look around noticing a toybox on the floor and a shelf with cuddly toys.\nYou also notice a picture next to the girls' bed.
+
+- Look in box [2A2-R-A]
+- Check toys on shelf [2A2-R-B]
+- Look at picture [2A2-R-C]
+
+[2A2-R3]
+Your great at finding stuff, you look carefully around the room spotting a toybox on the floor, a shelf with cuddly toys, a pictures next to the girl's bed and also something that seems to be under the bed.
+
+- Look in box [2A2-R-A]
+- Check toys on shelf [2A2-R-B]
+- Look at picture [2A2-R-C]
+- Look under bed [2A2-R-D]
+
+[2A2-R-A]
+In the box you see lots of pink things, a crown, a princess dress and lots and lots of unicorns, a red sports car.
+
+- Take the crown [2A2-R-A-1]
+- Take the dress [2A2-R-A-2]
+- Take a unicorn [2A2-R-A-3]
+- Take car [+ITEM Car][RETURN]
+- Back to room [RETURN]
+
+[2A2-R-A-1]
+As you take the crown the little girl stares at you with a really serious face and says "NO THAT LILY CROWN, DON'T TAKE LILY'S CROWN".
+
+- Put crown back [2A2-R-A]
+- Take crown [DL1]
+
+[2A2-R-A-2]
+As you take the dress the little girl stands up to her feed and swiftly slams her foot to the grand saying "NO THAT LILY DRESS, LILY BE PRINCESS".
+
+- Put dress back [2A2-R-A]
+- Take dress [DL1]
+
+[2A2-R-A-3]
+As you take the unicorn the little girl screams even louder than before that you cause hardly hear.
+
+- Continue [DL1]
+
+[DL1]
+[AUDIO girl-giggle, SINGLE][DELAY 3secs][AUDIO monster-coming, SINGLE]
+The little girl looks at you with an almost evil face and then starts giggling and says "Monster Coming" at which point you hear a loud thumping getting closer.
+
+- Exit Room [DL1-1]
+- Hide Under Bed [DL1-2]
+
+[DL1-1]
+As you open the door to exit the room you see a huge dark figure standing in the opening of the door, before you get time to react it's sharp claw hands are impaled straight through your chest.\n\n\n\nGAME OVER
+
+- Start Again [0]
+- Return To Menu [>Menu]
+
+[DL1-2]
+You crawl under the bed which is a tight squese, once under you hear the door slam open.\nYou attempt you peek at what opened the door but as you do you feel something grab your feet and pull you out.\n\nAs your pulled out from under the bed you see the girl still sat smiling now and also pointing under the bed.\n\nThe figure picks you up by your head and with one clean swipe cuts your head straight off.\n\n\n\nGAME OVER
+
+- Start Again [0]
+- Return To Menu [>Menu]
+
+[2A2-R-B]
+You look up at the shelf looking at the range of cuddly toys on display.\nThere are 3 types of toys that you see, a white owl, a range of colorful alien looking characters and one that you reconise...peppa pig.
+
+- Look at owl [2A2-R-B-1]
+- Look at aliens' [2A2-R-B-2] (IF ITEMS != wrongOh)
+- Look at peppa pig [2A2-R-B-3]
+- Back to Room [RETURN]
+
+[2A2-R-B-1]
+You pick up the owl and take a closer look. White with black strips it looks almost new.
+
+- Continue [2A2-R-B]
+
+[2A2-R-B-2]
+Looking at the aliens you see one red, one purple and one yellow. Upon further examination you notice a label on the aliens, "Dreamworks HOME Oh".
+
+- Take red alien [>TAKE wrongOh][2A2-R-B]
+- Take purple alien [>TAKE wrongOh][2A2-R-B]
+- Take yellow alien [>TAKE wrongOh][2A2-R-B]
+
+[2A2-R-B-3]
+You pickup peppa pig and take a closer look. Wearing a crown and holding a wand it seems to be a princess version of peppa pig.
+
+- Continue [2A2-R-B]
+
+
+
+
+
+
+
