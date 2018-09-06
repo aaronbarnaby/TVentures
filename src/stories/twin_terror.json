@@ -1,51 +1,64 @@
 [
     {
-        "KEY": "TT0",
-        "TEXT": "You wake up and find yourself in the pitch black, after pushing yourself to your feet you notice a porch light in the distance.\n\nAs you walk up to the house you notice that all the curtains are closed and you have no way to tell if anyone is home, however the front door is slightly open.",
-        "CHOICES": [
+        "key": "0",
+        "text": "You wake up and find yourself in the pitch black, after pushing yourself to your feet you notice a porch light in the distance.\n\nAs you walk up to the house you notice that all the curtains are closed and you have no way to tell if anyone is home, however, the front door is slightly open.",
+        "returnText": "You have made it back outside, the sun seems to be starting to come up as you can now see down the road almost to the end where you see cars passing by.",
+        "choices": [
             { 
-                "TEXT": "Enter House",
-                "ACTION": "next",
-                "NEXT": "TT1"
+                "text": "Enter House",
+                "action": { "type": "next", "target": "1" }
             },
             {
-                "TEXT": "Leave",
-                "ACTION": "next",
-                "NEXT": "TTE1"
+                "text": "Leave",
+                "action": { "type": "next", "target": "E1" },
+                "when": [{ "type": "enter_count", "value": "=1" }]
+            },
+            {
+                "text": "Leave",
+                "action": { "type": "next", "target": "E2" },
+                "when": [{ "type": "enter_count", "value": ">1" }]
             }
         ]
     },
     {
-        "KEY": "TTE1",
-        "TEXT": "You decide you want to part of whatever is in that house, you turn away and start the walk down the road.\n\n\n\nTHE END.",
-        "ONENTER": [{ "type": "end" }]
+        "key": "E1",
+        "text": "You decide you want to part of whatever is in that house, you turn away and start the walk down the road.\n\n\n\nTHE END.",
+        "onEnter": [{ "type": "end" }]
     },
     {
-        "KEY": "TT1",
-        "TEXT": "As you enter the house you hear the sound of children playing and laughing, It seems to be coming from upstairs.\n\nAfter a short while the laughing stops and you hear a cry to the point of screaming from a girl.\n\nAs you look around the room you entered you notice the stairs directly in front of you as well as two doors, One to the left and one right.",
-        "ONENTER": [
-            { "type": "audio", "target": "kids_opening", "volume": 0.05, "loop": false }
+        "key": "E2",
+        "text": "Your done, you want no more of this house and start to walk on down the road\n\n\n\nTHE END.",
+        "onEnter": [{ "type": "end" }]
+    },
+    {
+        "key": "1",
+        "text": "As you enter the house the door slams shut behind you and you hear the sound of children playing and laughing, It seems to be coming from upstairs.\n\nAfter a short while, the laughing stops and you hear a cry to the point of screaming from a girl.\n\nAs you look around the room you entered you notice the stairs directly in front of you as well as two doors, One to the left and one right.",
+        "returnText": "",
+        "onEnter": [
+            { "when": [{ "type": "enter_count", "value": "=1" }], "type": "audio", "target": "kids_opening", "volume": 0.05, "loop": false }
         ],
-        "CHOICES": [
+        "choices": [
             { 
-                "TEXT": "Head upstairs towards the sounds that you heard.",
-                "ACTION": "next",
-                "NEXT": "TTE2"
+                "text": "Head upstairs towards the sounds that you heard",
+                "action": { "type": "next", "target": "2" },
+                "when": [{ "type": "enter_count", "value": "=1" }]
             },
             { 
-                "TEXT": "Enter the door on the left",
-                "ACTION": "next",
-                "NEXT": "TTE2"
+                "text": "Head upstairs",
+                "action": { "type": "next", "target": "2" },
+                "when": [{ "type": "enter_count", "value": ">1" }]
             },
             { 
-                "TEXT": "Enter the door on the right",
-                "ACTION": "next",
-                "NEXT": "TTE2"
+                "text": "Enter the door on the left",
+                "action": { "type": "next", "target": "1A" }
             },
             { 
-                "TEXT": "Exit the house",
-                "ACTION": "next",
-                "NEXT": "TTD1"
+                "text": "Enter the door on the right",
+                "action": { "type": "next", "target": "1B" }
+            },
+            { 
+                "text": "Exit the house",
+                "action": { "type": "next", "target": "D1" }
             }
         ]
     },

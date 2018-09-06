@@ -24,14 +24,14 @@ export default class BonusLoadingState extends Phaser.State {
 
         // Map
         this.load.tilemap('map', './assets/bonus/pacman/map_pacman.json', null, Phaser.Tilemap.TILED_JSON);
-        this.load.spritesheet('pacman_tiles', './assets/bonus/pacman/Pacman.png', 32, 32);
-        //this.load.image('tile', './assets/bonus/pacman/maps/tile.png');
-        //this.load.image('safetile', './assets/bonus/pacman/maps/safetile.png');
+        this.load.spritesheet('pacman_tiles', './assets/bonus/pacman/pacman_tiles.png', 32, 32);
         
         // Items
         this.load.image('dot', './assets/bonus/pacman/dot.png');
-        this.load.image('pill', './assets/bonus/pacman/pills/spr_pill_0.png');
-        this.load.image('cherry', './assets/bonus/pacman/cherry/spr_cherry_0.png');
+        this.load.image('pill', './assets/bonus/pacman/pill.png');
+        this.load.image('cherry', './assets/bonus/pacman/cherry.png');
+        this.load.image('apple', './assets/bonus/pacman/apple.png');
+        this.load.image('strawberry', './assets/bonus/pacman/strawberry.png');
         
         // Pacman
         this.load.spritesheet('pacman_walk', './assets/bonus/pacman/pacman/pacman_walk.png', 32, 32);

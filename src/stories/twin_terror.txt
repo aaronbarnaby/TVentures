@@ -185,7 +185,16 @@ You pickup peppa pig and take a closer look. Wearing a crown and holding a wand 
 
 - Continue [2A2-R-B]
 
+[2A2-R-C]
+You walk over to the side of the bed and pick up the picture to take a better look.  You can see the same little girl in a princess outfit smiling with a pink little alien.
 
+[2A2-R-D]
+You kneel down to take a look under the bed near the back of the bed you can see something, it looks like a dog toy.
+
+- Take dog toy [+ITEM dogToy]
+- Ignore Key [RETURN]
+
+- Continue [RETURN]
 
 
 
