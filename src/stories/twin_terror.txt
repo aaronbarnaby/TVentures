@@ -34,7 +34,7 @@ Before you have time to react you feel a sharp pain in your chest.\n\nYou look d
 You walk upstairs towards the crying, it's getting darker as you walk upstairs.\n\nOnce you reach the top you notice a long corridor in front of you, you can't see the end as it's completely black in darkness.\n\nLooking down the hallway you can see 3 doors, the first door to the left has a sign on it saying Archie's room there is a light you notice in the crack under the door.  Down the right side the first door has a sign saying Lily's room there is also light from under the door and also you can hear the crying girl inside. The last door you see on the right has no light but you notice the door slightly open.
 
 - Continue towards the crying and enter Lily's room (First Right) [2A]
-- Enter Archie's Room (First Right) [2B]
+- Enter Archie's Room (First Left) [2B]
 - Enter the second door on the right which is slightly open [2C]
 - Walk to the end of the corridor [3]
 - Go back downstairs [D2]
@@ -58,7 +58,7 @@ You walk into the room with the girl crying, as you do the crying stops and you 
 
 - Sit next to and talk to the girl [2A1]
 - Look around the room [2A2]
-- Leave Room [2A3]
+- Leave Room [2]
 
 [2A1]
 Guessing the girls' name is Lily because of the sign you saw on the door you sit down next to the girl and start talking.\n\n"Hi Lily, What's Wrong?".  To which she replies "Oh! I want Oh!".

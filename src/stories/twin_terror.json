@@ -11,12 +11,12 @@
             {
                 "text": "Leave",
                 "action": { "type": "next", "target": "E1" },
-                "when": [{ "type": "enter_count", "value": "=1" }]
+                "when": [{ "type": "first_enter", "value": "1" }]
             },
             {
                 "text": "Leave",
                 "action": { "type": "next", "target": "E2" },
-                "when": [{ "type": "enter_count", "value": ">1" }]
+                "when": [{ "type": "first_enter", "value": "0" }]
             }
         ]
     },
@@ -35,18 +35,19 @@
         "text": "As you enter the house the door slams shut behind you and you hear the sound of children playing and laughing, It seems to be coming from upstairs.\n\nAfter a short while, the laughing stops and you hear a cry to the point of screaming from a girl.\n\nAs you look around the room you entered you notice the stairs directly in front of you as well as two doors, One to the left and one right.",
         "returnText": "",
         "onEnter": [
-            { "when": [{ "type": "enter_count", "value": "=1" }], "type": "audio", "target": "kids_opening", "volume": 0.05, "loop": false }
+            { "when": [{ "type": "first_enter", "value": "1" }], "type": "game_state", "key": "girl-crying", "value": "1" },
+            { "when": [{ "type": "first_enter", "value": "1" }], "type": "audio", "key": "kids_opening", "options": { "volume": 0.05, "loop": false } }
         ],
         "choices": [
             { 
                 "text": "Head upstairs towards the sounds that you heard",
                 "action": { "type": "next", "target": "2" },
-                "when": [{ "type": "enter_count", "value": "=1" }]
+                "when": [{ "type": "first_enter", "value": "1" }]
             },
             { 
                 "text": "Head upstairs",
                 "action": { "type": "next", "target": "2" },
-                "when": [{ "type": "enter_count", "value": ">1" }]
+                "when": [{ "type": "first_enter", "value": "0" }]
             },
             { 
                 "text": "Enter the door on the left",
@@ -63,37 +64,265 @@
         ]
     },
     {
-        "KEY": "TTD1",
-        "TEXT": "As you turn to leave the house you hear a large thumping, faster and faster.\n\nYou dare not turn around to look so you just start running.",
-        "ONENTER": [
-            { "type": "audio", "target": "monster_roar", "volume": 0.3, "loop": false },
-            { "type": "audio", "target": "monster_coming", "volume": 0.2, "loop": false, "delay": 1000 },
-            { "type": "audio", "target": "outside_running", "volume": 0.1, "loop": false, "delay": 5000 }
+        "ket": "D1",
+        "text": "As you turn to leave the house you hear a large thumping, faster and faster.\n\nYou dare not turn around to look so you just swin the door open and start running.",
+        "onEnter": [
+            { "type": "audio", "key": "monster_roar", "options": { "volume": 0.3, "loop": false } },
+            { "type": "audio", "key": "monster_coming", "options": { "volume": 0.2, "loop": false, "delay": 1000 } },
+            { "type": "audio", "key": "outside_running", "options": { "volume": 0.1, "loop": false, "delay": 5000 } }
         ],
-        "NEXT": "TTD1-1"
+        "next": "D1-1"
     },
     {
-        "KEY": "TTD1-1",
-        "TEXT": "Before you have time to react you feel a sharp pain in your chest.\n\nYou look down and see a spike like claw that seems to have impaled you.\n\nBefore you know it you fall flat on the ground and everything goes black.\n\n\n\nGAME OVER",
-        "ONENTER": [
-            { "type": "audio", "target": "monster_growl", "volume": 0.5, "loop": false, "delay": 1000 }
+        "key": "D1-1",
+        "text": "Before you have time to react you feel a sharp pain in your chest.\n\nYou look down and see a claw that seems to have impaled you.\n\n\nBefore you know it you fall flat on the ground and everything goes black.\n\n\n\nGAME OVER",
+        "onEnter": [
+            { "type": "audio", "key": "monster_growl", "options": { "volume": 0.5, "loop": false, "delay": 1000 } },
+            { "type": "death" }
+        ]
+    },
+    {
+        "key": "2",
+        "text": "You walk upstairs towards the crying, it's getting darker as you walk upstairs.\n\nOnce you reach the top you notice a long corridor in front of you, you can't see the end as it's completely black in darkness.\n\nLooking down the hallway you can see 3 doors, the first door to the left has a sign on it saying Archie's room there is a light you notice in the crack under the door.  Down the right side the first door has a sign saying Lily's room there is also light from under the door and also you can hear the crying girl inside. The last door you see on the right has no light but you notice the door slightly open.",
+        "returnText": "You reenter the hallway, standing at the top of the stairs you look back down the hallway.",
+        "onEnter": [
+            { "when": [{ "type": "game_state", "key": "girl-crying", "value": "1" }], "type": "audio", "key": "girl-crying", "options": { "volume": 0.5, "loop": true } }
         ],
-        "CHOICES": [
-            { 
-                "TEXT": "Start Again",
-                "ACTION": "next",
-                "NEXT": "TT0"
+        "choices": [
+            {
+                "text": "Continue towards the crying and enter Lily's room (First Right)",
+                "action": { "type": "next", "target": "2A" },
+                "when": [{ "type": "game_state", "key": "girl-crying", "value": "1" }]
             },
             {
-                "TEXT": "Return To Menu",
-                "ACTION": "redirect",
-                "TARGET": "Menu"
+                "text": "Enter Lily's room (First Right)",
+                "action": { "type": "next", "target": "2A" },
+                "when": [{ "type": "game_state", "key": "girl-crying", "value": "0" }]
+            },
+            {
+                "text": "Enter Archie's Room (First Left)",
+                "action": { "type": "next", "target": "2B" }
+            },
+            {
+                "text": "Enter the second door on the right which is slightly open",
+                "action": { "type": "next", "target": "2C" },
+                "when": [{ "type": "game_state", "key": "entered-bathroom", "value": "0" }]
+            },
+            {
+                "text": "Enter the bathroom (Second Right)",
+                "action": { "type": "next", "target": "2C" },
+                "when": [{ "type": "game_state", "key": "entered-bathroom", "value": "1" }]
+            },
+            {
+                "text": "Walk to the end of the corridor",
+                "action": { "type": "next", "target": "3" }
+            },
+            {
+                "text": "Go back downstairs",
+                "action": { "type": "next", "target": "D2" }
             }
         ]
     },
     {
-        "KEY": "TTE2",
-        "TEXT": "Seems like this story isn't finished.\n\n\n\nTHE END.",
-        "ONENTER": [{ "type": "end" }]
+        "key": "D2",
+        "text": "As you walk down the stairs the floor below creaks you pause for a moment until you hear a loud roar.You begin to run as fast as you can straight to the front door but it's locked.",
+        "onEnter": [
+            { "type": "audio", "key": "floor-creek", "options": { "volume": 0.6, "loop": false, "delay": 2000 } },
+            { "type": "audio", "key": "monster-roar", "options": { "volume": 1, "loop": false, "delay": 3000 } },
+            { "type": "audio", "key": "monster-coming", "options": { "volume": 0.8, "loop": true, "delay": 5000 } }
+        ],
+        "choices": [
+            {
+                "text": "Kick Door Open",
+                "action": { "type": "next", "target": "D0" }
+            },
+            {
+                "text": "Find Another Exit",
+                "action": { "type": "next", "target": "D0A" }
+            }
+        ]
+    },
+    {
+        "key": "D0A",
+        "text": "As you turn around you see a large dark figure standing directly in front of you, it pulls its long claw-like arm back and then swiftly forwards straight into your chest.  You move your arms towards the figure and as you do it quickly opens it's mouth and with huge sharp white teeth grabs onto one of your hands and rips it straight off. You then fall back flat on your back and as the figure looms over you your eyes begin to close falling to black.\n\n\n\nGAME OVER",
+        "onEnter": [
+            { "type": "audio", "key": "monster_growl", "options": { "volume": 1, "loop": false, "delay": 500 } },
+            { "type": "death" }
+        ]
+    },
+    {
+        "key": "2A",
+        "text": "You walk into the room with the girl crying, as you do the crying stops and you notice a little girl sad in the middle of the room staring at you with tears falling down her face.",
+        "returnText": "CUSTOM",
+        "customReturnText": [
+            { "when": { "type": "game_state", "key": "girl-crying", "value": "1" }, "text": "You walk into the room with the girl crying, as you do the crying stops and you notice a little girl sad in the middle of the room staring at you with tears falling down her face." },
+            { "when": { "type": "game_state", "key": "girl-crying", "value": "0" }, "text": "You walk into the room, you see the Lily spinning round smiling with her arms streched out and her pink Oh in hand." }
+        ],
+        "choices": [
+            {
+                "text": "Talk to Lily",
+                "action": { "type": "next", "target": "2A1" }
+            },
+            {
+                "text": "Look around the room",
+                "action": { "type": "next", "target": "2A2" }
+            },
+            {
+                "text": "Leave Room",
+                "action": { "type": "next", "target": "2" },
+                "onAction": [
+                    { "when": { "type": "game_state", "key": "girl-crying", "value": "1" }, "type": "leave_text", "options": { "text": "As soon as you open the door the leave the room the girl starts crying again." } }
+                ]
+            }
+        ]
+    },
+    {
+        "key": "2A1",
+        "text": "\"Hi Lily, What's Wrong?\". She looks at you and quickly responses angrily \"Oh! I want Oh!\"",
+        "returnText": "What do you want to ask Lily?",
+        "choices": [
+            {
+                "text": "\"What is Oh?\"",
+                "action": { "type": "next", "target": "2A1-1" },
+                "when": [{ "type": "conversation", "key": "lily-1", "value": "0" }]
+            },
+            {
+                "text": "\"Where is Oh?\"",
+                "action": { "type": "next", "target": "2A1-2" },
+                "when": [{ "type": "conversation", "key": "lily-2", "value": "0" }]
+            },
+            {
+                "text": "Give Oh to Lily",
+                "action": { "type": "next", "target": "2A1-3" },
+                "onAction": [
+                    { "type": "use_item", "key": "wrongOh" }
+                ],
+                "when": [{ "type": "item", "key": "wrongOh", "value": "1" }]
+            },
+            {
+                "text": "Give Pink Oh to Lily",
+                "action": { "type": "next", "target": "2A1-4" },
+                "onAction": [
+                    { "type": "use_item", "key": "pinkOh" }
+                ],
+                "when": [{ "type": "item", "key": "pinkOh", "value": "1" }]
+            },
+            {
+                "text": "Stop talking to Lily",
+                "action": { "type": "next", "target": "2A" }
+            }
+        ]
+    },
+    {
+        "key": "2A1-1",
+        "text": "She replies \"Oh! I want my Oh!\"",
+        "onEnter": [
+            { "type": "conversation", "key": "lily-1", "value": "1" }
+        ],
+        "next": "2A1"
+    },
+    {
+        "key": "2A1-2",
+        "text": "She replies \"Archie!, Archie took Oh!\"",
+        "onEnter": [
+            { "type": "conversation", "key": "lily-2", "value": "1" }
+        ],
+        "next": "2A1"
+    },
+    {
+        "key": "2A1-3",
+        "text": "You hand Lily the Oh toy and she throws it to the side and says evilly \"LILY DON'T WANT THAT OH! LILY WANTS' PINK OH!\"",
+        "next": "2A1"
+    },
+    {
+        "key": "2A1-4",
+        "text": "As soon as you pull out the pink Oh to hand the the girl her hands strech out towards you and with a huge smile she starts squeeling with happyness.",
+        "onEnter": [
+            { "type": "game_state", "key": "girl-crying", "value": "0" }
+        ],
+        "next": "2A"
+    },
+    {
+        "key": "2A2",
+        "text": "You start to look around the room.",
+        "onEnter": [
+            { 
+                "when": [{ "type": "rolled", "key": "2A2", "value": "0" }], 
+                "type": "roll", 
+                "key": "2A2", 
+                "options": {
+                    "numberOfDice": "1",
+                    "action": [
+                        { "min": "1", "max": "3", "type": "next", "target": "2A2-R1" },
+                        { "min": "4", "max": "5", "type": "next", "target": "2A2-R2" },
+                        { "min": "6", "max": "6", "type": "next", "target": "2A2-R3" }
+                    ]
+                } 
+            },
+            { "when": [{ "type": "rolled", "key": "2A2", "value": ">0" }], "type": "rolled-value", "key": "2A2" }
+        ]
+    },
+    {
+        "key": "2A2-R1",
+        "text": "You have always been bad at finding stuff, however you take a look around and see a toybox on the floor and a shelf with some cuddly toys on.",
+        "onEnter": [
+            { "type": "rolled", "key": "2A2", "value": "1" }
+        ],
+        "choices": [
+            { 
+                "text": "Look in box",
+                "action": { "type": "next", "target": "2A2-R-A" }
+            },
+            { 
+                "text": "Check toys on shelf",
+                "action": { "type": "next", "target": "2A2-R-B" }
+            }
+        ]
+    },
+    {
+        "key": "2A2-R2",
+        "text": "You feel that your ok at finding stuff, you look around noticing a toybox on the floor and a shelf with cuddly toys.\nYou also notice a picture next to the girls' bed.",
+        "onEnter": [
+            { "type": "rolled", "key": "2A2", "value": "2" }
+        ],
+        "choices": [
+            { 
+                "text": "Look in box",
+                "action": { "type": "next", "target": "2A2-R-A" }
+            },
+            { 
+                "text": "Check toys on shelf",
+                "action": { "type": "next", "target": "2A2-R-B" }
+            },
+            { 
+                "text": "Look at picture",
+                "action": { "type": "next", "target": "2A2-R-C" }
+            }
+        ]
+    },
+    {
+        "key": "2A2-R3",
+        "text": "Your great at finding stuff, you look carefully around the room spotting a toybox on the floor, a shelf with cuddly toys, a pictures next to the girl's bed and also something that seems to be under the bed.",
+        "onEnter": [
+            { "type": "rolled", "key": "2A2", "value": "3" }
+        ],
+        "choices": [
+            { 
+                "text": "Look in box",
+                "action": { "type": "next", "target": "2A2-R-A" }
+            },
+            { 
+                "text": "Check toys on shelf",
+                "action": { "type": "next", "target": "2A2-R-B" }
+            },
+            { 
+                "text": "Look at picture",
+                "action": { "type": "next", "target": "2A2-R-C" }
+            },
+            { 
+                "text": "Look under bed",
+                "action": { "type": "next", "target": "2A2-R-D" }
+            }
+        ]
     }
 ]

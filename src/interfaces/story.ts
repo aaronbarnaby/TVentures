@@ -1,5 +1,5 @@
-import StoryNode from "./storyNode";
 import TextManager from "../lib/TextManager";
+import { StoryNode } from "./storyNode";
 
 export default interface IStory {
     
@@ -7,9 +7,9 @@ export default interface IStory {
 
     startingNode: string;
 
-    storyData: [StoryNode];
+    storyData: StoryNode[];
 
-    charactors: [any];
+    charactors: any[];
 
     textManager: TextManager;
 }
