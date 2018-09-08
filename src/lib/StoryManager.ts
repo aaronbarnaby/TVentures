@@ -1,7 +1,8 @@
 import * as _ from 'lodash';
 import { Globals } from '../globals';
+
 import Sliders from '../interfaces/sliders';
-import StoryNode from '../interfaces/storyNode';
+import { StoryNode, IAudioOption, IChoice, IDiceOptions, IWhen, ITextOptions } from '../interfaces/storyNode';
 
 import Dice from '../components/dice';
 
@@ -10,6 +11,7 @@ var mainFontColor = '#FFBD29';
 var choiceColor = '#FFFFFF';
 var choiceHighlightColor = '#FFF700';
 var choicePressColor = '#FFB000';
+
 var fontColorPower = '#F45E14';
 var fontColorKarma = '#12B516';
 var fontColorIntellect = '#00B0FF';
@@ -33,12 +35,9 @@ export default class StoryManager {
     textStyle: any;
     choicesStyle: any;
     
-    // Player
-    character: any = {};
-    
     // Story
-    storyData: [StoryNode];
-    backgroundSounds: [any];
+    storyData: StoryNode[];
+    backgroundSounds: any[];
     
     storyText: Phaser.Text;
     
@@ -48,6 +47,8 @@ export default class StoryManager {
     choicesHeight: number;
     choices: any = [];
     loadedChoices: any = [];
+    
+    diceCallbackFunction: Function = null;
     
     constructor() {
         this.choicesHeight = 100; // Default Height
@@ -74,60 +75,156 @@ export default class StoryManager {
         // Add Method to Access Save Instance
         Globals.save.writeToGameLog(choiceNumber);
         
-        var choiceData = this.loadedChoices[choiceNumber].data;
+        var choiceData: IChoice = this.loadedChoices[choiceNumber].data;
         
-        if (choiceData.ACTION === 'next') {
-            var nextNode = choiceData.NEXT;
-            
-            this.loadStoryNode(nextNode);
+        let continueAction = true;
+        if (choiceData.onAction) {
+            _.forEach(choiceData.onAction, (a) => {
+                if (this.checkWhen(a.when)) {
+                    if (a.type === 'use_item') {
+                        let itemCount = Globals.save.currentItems[a.key];
+                        let newCount = itemCount - ((a.value as number) || 1);
+
+                        if (newCount > 0) {
+                            Globals.save.currentItems[a.key] = newCount;
+                        } else {
+                            delete Globals.save.currentItems[a.key];
+                        }
+                    } else if (a.type === 'leave_text') {
+                        // Print Text with Continue Choice
+                        let textOptions: ITextOptions = a.options as ITextOptions;
+                        this.storyText.setText(textOptions.text);
+                        this.storyText.y = this.uiFrames.top.y;
+                        this.fadeInText();
+                        
+                        let continueChoise: IChoice = {
+                            text: 'Continue...',
+                            action: choiceData.action
+                        };
+                        
+                        this.addChoice(0, continueChoise);
+                        this.adjustSliders();
+                        
+                        continueAction = false;
+                    }
+                }
+            });
         }
         
-        if (choiceData.ACTION === 'redirect') {
-            this.game.state.start(choiceData.TARGET);
+        if (continueAction) {
+            if (choiceData.action.type === 'next') {
+                this.loadStoryNode(choiceData.action.target);
+            } else if (choiceData.action.type === 'state') {
+                this.game.state.start(choiceData.action.target);
+            }
         }
     }
     
     loadStoryNode(node) {
-        var data = _.find(this.storyData, o => o.KEY === node);
+        var data = _.find(this.storyData, o => o.key === node);
         
         if (data) {
-            this.storyText.setText(data.TEXT);
+            // Check if First Enter
+            const hasEntered = Globals.save.getStoryVariable(`entered:${node}`);
+            if (!hasEntered) {
+                // Update Room Enter Count
+                Globals.save.updateStoryVariable(`entered:${node}`, true);
+            }
+            
+            if (!hasEntered || !data.returnText) {
+                this.storyText.setText(data.text);
+            } else {
+                if (data.returnText === 'CUSTOM') {
+                    // Custom Return Text
+                    let text = data.text;
+                    _.forEach(data.customReturnText, (i) => {
+                        if (this.checkWhen(i.when)) {
+                            text = i.text;
+                        }
+                    });
+                    this.storyText.setText(text);
+                } else {
+                    this.storyText.setText(data.returnText);
+                }
+            }
             this.storyText.y = this.uiFrames.top.y;
             this.fadeInText();
             
-            this.loadChoices(data.KEY);
+            this.loadChoices(data.key);
             this.adjustSliders();
             
-            Globals.save.currentNodeKey = data.KEY;
+            Globals.save.currentNodeKey = data.key;
             
-            if (typeof(data.ONENTER) !== "undefined") {
-                _.forEach(data.ONENTER, (x) => {
-                    if (x.type === 'end') {
-                        // Add Method to Access Save Instance
-                        Globals.save.currentNodeKey = Globals.activeStory.startingNode;
-                        
-                        // Return To Menu
-                        this.game.time.events.add(10000, () => {
-                            this.game.state.start('Menu');
-                        }, this);
-                    } else if (x.type === 'audio') {
-                        let audioClip = this.game.add.audio(x.target, (x.volume || 1), (x.loop || false));
-                        
-                        if (Globals.hasSound) {
-                            // Check for Delayed Play
-                            if (x.delay) {
-                                this.game.time.events.add(x.delay, () => {
-                                    audioClip.play();
-                                }, this);
-                            } else {
-                                audioClip.play();
+            if (data.onEnter) {
+                _.forEach(data.onEnter, (x) => {
+                    if (this.checkWhen(x.when)) {
+                        if (x.type === 'rolled') {
+                            // Set Rolled Value
+                            Globals.save.updateStoryVariable(`roomRolled:${x.key}`, true);
+                            Globals.save.updateStoryVariable(`roomRoll:${x.key}`, x.value);
+                        } else if (x.type === 'rolled-value') {
+                            // Direct to Rolled Value Target
+                            let rollValue = Globals.save.getStoryVariable(`roomRoll:${x.key}`);
+                            let roomNode = `${node}-R${rollValue}`;
+                            
+                            return this.loadStoryNode(roomNode);
+                        } else if (x.type === 'roll') {
+                            // Trigger Roll
+                            let diceOptions: IDiceOptions = x.options as IDiceOptions;
+                            this.diceCallbackFunction = (result) => {
+                                _.forEach(diceOptions.action, (a) => {
+                                    if (result >= a.min && result <= a.max) {
+                                        if (a.type === 'next') {
+                                            this.loadStoryNode(a.target);
+                                        }
+                                    }
+                                });
+                            };
+                            this.displayModal(`dice_${diceOptions.numberOfDice}`);
+                        } else if (x.type === 'game_state') {
+                            Globals.save.updateStoryVariable(x.key, x.value);
+                        } else if (x.type === 'conversation') {
+                            Globals.save.updateStoryVariable(`conversation:${x.key}`, x.value);
+                        } else if (x.type === 'audio') {
+                            if (this.game.cache.checkSoundKey(x.key)) {
+                                let audioOption: IAudioOption = x.options as IAudioOption;
+                                let audioClip = this.game.add.audio(x.key, (audioOption.volume || 1), (audioOption.loop || false));
+                                
+                                if (Globals.hasSound) {
+                                    if (audioOption.delay) {
+                                        this.game.time.events.add(audioOption.delay, () => {
+                                            audioClip.play();
+                                        }, this);
+                                    } else {
+                                        audioClip.play();
+                                    }
+                                }
+                                
+                                if (this.backgroundSounds) {
+                                    this.backgroundSounds.push({ sound: audioClip, loop: audioOption.loop });
+                                } else {
+                                    this.backgroundSounds = [{ sound: audioClip, loop: audioOption.loop }];
+                                }
                             }
-                        }
-                        
-                        if (this.backgroundSounds) {
-                            this.backgroundSounds.push({ sound: audioClip, loop: x.loop });
-                        } else {
-                            this.backgroundSounds = [{ sound: audioClip, loop: x.loop }];
+                        } else if (x.type === 'end' || x.type === 'death') {
+                            // RESET GAME
+                            Globals.save.loadNew(Globals.save.currentStory);
+                            
+                            // Add Choice Start Again
+                            let startAgainChoice: IChoice = {
+                                text: 'Start Again',
+                                action: { type: 'next', target: '0' }
+                            };
+                            this.addChoice(0, startAgainChoice);
+                            
+                            // Add Choice Return To Menu
+                            let returnToMenuChoice: IChoice = {
+                                text: 'Return To Menu',
+                                action: { type: 'state', target: 'Menu' }
+                            };
+                            this.addChoice(1, returnToMenuChoice);
+                            
+                            this.adjustSliders();
                         }
                     }
                 });
@@ -135,6 +232,41 @@ export default class StoryManager {
         } else {
             alert(`Invalid Target Node: ${node}`);
         }
+    }
+    
+    checkWhen(when: IWhen[]) {
+        let trigger = false;
+        if (when) {
+            let whenPassed = 0;
+            _.forEach(when, (w) => {
+                if (w.type === 'item') {
+                    let item = Globals.save.currentItems[w.key];
+                    if (item && item >= w.value) {
+                        whenPassed++;
+                        if (when.length === whenPassed) {
+                            trigger = true;
+                        }
+                    }
+                } else {
+                    let variableKey = w.key;
+                    if (w.type === 'rolled') {
+                        variableKey = `roomRoll:${w.key}`;
+                    } else if (w.type === 'conversation') {
+                        variableKey = `conversation:${w.key}`;
+                    }
+                    
+                    if (Globals.save.checkStoryVariable(variableKey, w.value)) {
+                        whenPassed++;
+                        if (when.length === whenPassed) {
+                            trigger = true;
+                        }
+                    } 
+                }
+            });
+        } else {
+            trigger = true;
+        }
+        return trigger;
     }
     
     characterClick() {
@@ -223,7 +355,7 @@ export default class StoryManager {
         if (this.uiModal && this.uiModal.diceGroup) {
             // Remove Controls When Triggered
             this.uiModal.diceControls.visible = false;
-
+            
             // Trigger Dice Roll
             this.uiModal.diceGroup.callAll('roll', null);
             this.game.time.events.add(100, this.rollDiceCompleted, this);
@@ -244,15 +376,16 @@ export default class StoryManager {
                 this.uiModal.diceTotal.setText(total);
                 this.game.time.events.add(2000, this.rollDiceCallback, this, total);
             } else {
-                var timer = this.game.time.events.add(100, this.rollDiceCompleted, this);
+                this.game.time.events.add(100, this.rollDiceCompleted, this);
             }
         }
     }
-
+    
     rollDiceCallback(diceTotal) {
-        console.log(`Dice Total: ${diceTotal}`);
-        // TODO: Do something with the dice total that was required.
-
+        if (this.diceCallbackFunction) {
+            this.diceCallbackFunction(diceTotal);
+        }
+        
         this.hideModal();
     }
     
@@ -446,68 +579,45 @@ export default class StoryManager {
         this.choicesHeight = 0;
     }
     
-    loadChoices(nodeKey) {
+    addChoice(index: number, data: IChoice) {
+        this.choices[index].setText(data.text);
+        this.choices[index].y = this.uiFrames.bottom.y + this.choicesHeight + ((index !== 0) ? choicesSpacer : 0);
+        this.choices[index].fill = this.checkChoiceColor(data);
+        this.choicesHeight += this.choices[index].height + ((index !== 0) ? choicesSpacer : 0);
+        
+        this.loadedChoices[index] = {
+            color: this.choices[index].fill,
+            data: data
+        };
+    }
+    
+    loadChoices(nodeKey: string) {
         this.resetChoices();
         
-        var nodeData = _.find(this.storyData, o => o.KEY === nodeKey);
+        var nodeData = _.find(this.storyData, o => o.key === nodeKey);
         
         var index = 0;
-        if (nodeData.CHOICES && nodeData.CHOICES.length > 0) {
-            _.forEach(nodeData.CHOICES, (i) => {
-                if (this.checkChoiceDisplay(i)) {
-                    this.choices[index].setText(i.TEXT);
-                    this.choices[index].y = this.uiFrames.bottom.y + this.choicesHeight + ((index !== 0) ? choicesSpacer : 0);
-                    this.choices[index].fill = this.checkChoiceColor(i);
-                    this.choicesHeight += this.choices[index].height + ((index !== 0) ? choicesSpacer : 0);
-                    
-                    this.loadedChoices[index] = {
-                        color: this.choices[index].fill,
-                        data: i
-                    };
+        if (nodeData.choices && nodeData.choices.length > 0) {
+            _.forEach(nodeData.choices, (i) => {
+                if (this.checkWhen(i.when)) {
+                    this.addChoice(index, i);
                     index++;
                 }
             });
-        } else if (nodeData.NEXT) {
+        } else if (nodeData.next) {
             // No Choices, Add a Continue
-            this.choices[0].setText('Continue...');
-            this.choices[0].y = this.uiFrames.bottom.y;
-            this.choicesHeight = this.choices[0].height;
-            this.loadedChoices[0] = {
-                color: this.choices[0].fill,
-                data: {
-                    ACTION: 'next',
-                    NEXT: nodeData.NEXT
-                }
+            let choiceData: IChoice = {
+                text: "Continue...",
+                action: { type: "next", target: nodeData.next }
             };
+            this.addChoice(0, choiceData);
         }
     }
     
-    checkChoiceDisplay(choiceData) {
-        // TODO: Add Choice Costs
-        
-        // There are no costs for this choice
-        return true;
-    }
-    
-    checkChoiceColor(choiceData) {
-        if (typeof(choiceData.COLOR) !== "undefined") {
-            if (choiceData.COLOR === 'red') {
+    checkChoiceColor(choiceData: IChoice) {
+        if (typeof(choiceData.color) !== "undefined") {
+            if (choiceData.color === 'red') {
                 return '#F00E0E';
-            }
-        }
-        
-        if (typeof(choiceData.REQUIRED_TYPE) !== "undefined") {
-            if (choiceData.REQUIRED_TYPE === 'power') {
-                return fontColorPower;
-            }
-            if (choiceData.REQUIRED_TYPE === 'intellect') {
-                return fontColorIntellect;
-            }
-            if (choiceData.REQUIRED_TYPE === 'karma') {
-                return fontColorKarma;
-            }
-            if (choiceData.REQUIRED_TYPE === 'love') {
-                return fontColorLove;
             }
         }
         

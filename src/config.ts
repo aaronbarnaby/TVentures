@@ -26,7 +26,7 @@ export let STORYBOOKS = [
   {
     Key: "TWIN_TERROR",
     Name: "Twin Terror",
-    StartingNode: "TT0",
+    StartingNode: "0",
     Assets: [
       { type: "audio", path: "./assets/sounds/kids-laughing-then-crying.mp3", target: "kids_opening" },
       { type: "audio", path: "./assets/sounds/monster-coming.mp3", target: "monster_coming" },

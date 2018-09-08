@@ -5,21 +5,21 @@ export interface StoryNode {
 
     text: string;
 
-    returnText: string;
+    returnText?: string;
 
-    customReturnText: ICustomReturnText[];
+    customReturnText?: ICustomReturnText[];
 
-    choices: IChoice[];
+    choices?: IChoice[];
 
-    onEnter: IOnEvent[];
+    onEnter?: IOnEvent[];
 
-    next: string;
+    next?: string;
     
 }
 
 export interface ICustomReturnText {
 
-    when: IWhen;
+    when: IWhen[];
 
     text: string;
 
@@ -27,28 +27,28 @@ export interface ICustomReturnText {
 
 export interface IOnEvent {
 
-    when: IWhen[];
+    when?: IWhen[];
 
     type: string; 
 
     key: string;
 
-    value: string;
+    value?: string | boolean | number;
 
-    options: IAudioOption | ITextOptions;
+    options?: IAudioOption | ITextOptions | IDiceOptions;
 }
 
 export interface IChoice {
 
     text: string;
 
-    color: string;
+    color?: string;
 
     action: IAction;
 
-    when: IWhen[];
+    when?: IWhen[];
 
-    onAction: IOnEvent[];
+    onAction?: IOnEvent[];
 
 }
 
@@ -66,20 +66,41 @@ export interface IWhen {
 
     key: string;
 
-    value: string;
+    value: string | boolean;
 
 }
 
 export interface IAudioOption {
 
-    volumne: number;
+    volume?: number;
 
-    loop: boolean;
+    loop?: boolean;
 
-    delay: number;
+    delay?: number;
+
 }
 
 export interface ITextOptions {
 
     text: string; 
+
+}
+
+export interface IDiceOptions {
+
+    numberOfDice: number;
+
+    action: IDiceOptionAction[];
+}
+
+export interface IDiceOptionAction {
+
+    min: number;
+
+    max: number;
+
+    type: string;
+
+    target: string;
+    
 }

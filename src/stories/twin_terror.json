@@ -11,12 +11,12 @@
             {
                 "text": "Leave",
                 "action": { "type": "next", "target": "E1" },
-                "when": [{ "type": "first_enter", "value": "1" }]
+                "when": [{ "key": "entered:0", "value": true }]
             },
             {
                 "text": "Leave",
                 "action": { "type": "next", "target": "E2" },
-                "when": [{ "type": "first_enter", "value": "0" }]
+                "when": [{ "key": "entered:0", "value": false }]
             }
         ]
     },
@@ -35,19 +35,19 @@
         "text": "As you enter the house the door slams shut behind you and you hear the sound of children playing and laughing, It seems to be coming from upstairs.\n\nAfter a short while, the laughing stops and you hear a cry to the point of screaming from a girl.\n\nAs you look around the room you entered you notice the stairs directly in front of you as well as two doors, One to the left and one right.",
         "returnText": "",
         "onEnter": [
-            { "when": [{ "type": "first_enter", "value": "1" }], "type": "game_state", "key": "girl-crying", "value": "1" },
-            { "when": [{ "type": "first_enter", "value": "1" }], "type": "audio", "key": "kids_opening", "options": { "volume": 0.05, "loop": false } }
+            { "when": [{ "key": "entered:1", "value": true }], "type": "game_state", "key": "girl-crying", "value": true },
+            { "when": [{ "key": "entered:1", "value": true }], "type": "audio", "key": "kids_opening", "options": { "volume": 0.05, "loop": false } }
         ],
         "choices": [
             { 
                 "text": "Head upstairs towards the sounds that you heard",
                 "action": { "type": "next", "target": "2" },
-                "when": [{ "type": "first_enter", "value": "1" }]
+                "when": [{ "key": "entered:1", "value": true }]
             },
             { 
                 "text": "Head upstairs",
                 "action": { "type": "next", "target": "2" },
-                "when": [{ "type": "first_enter", "value": "0" }]
+                "when": [{ "key": "entered:1", "value": false }]
             },
             { 
                 "text": "Enter the door on the left",
@@ -86,18 +86,18 @@
         "text": "You walk upstairs towards the crying, it's getting darker as you walk upstairs.\n\nOnce you reach the top you notice a long corridor in front of you, you can't see the end as it's completely black in darkness.\n\nLooking down the hallway you can see 3 doors, the first door to the left has a sign on it saying Archie's room there is a light you notice in the crack under the door.  Down the right side the first door has a sign saying Lily's room there is also light from under the door and also you can hear the crying girl inside. The last door you see on the right has no light but you notice the door slightly open.",
         "returnText": "You reenter the hallway, standing at the top of the stairs you look back down the hallway.",
         "onEnter": [
-            { "when": [{ "type": "game_state", "key": "girl-crying", "value": "1" }], "type": "audio", "key": "girl-crying", "options": { "volume": 0.5, "loop": true } }
+            { "when": [{ "key": "girl-crying", "value": true }], "type": "audio", "key": "girl-crying", "options": { "volume": 0.5, "loop": true } }
         ],
         "choices": [
             {
                 "text": "Continue towards the crying and enter Lily's room (First Right)",
                 "action": { "type": "next", "target": "2A" },
-                "when": [{ "type": "game_state", "key": "girl-crying", "value": "1" }]
+                "when": [{ "key": "girl-crying", "value": true }]
             },
             {
                 "text": "Enter Lily's room (First Right)",
                 "action": { "type": "next", "target": "2A" },
-                "when": [{ "type": "game_state", "key": "girl-crying", "value": "0" }]
+                "when": [{ "key": "girl-crying", "value": false }]
             },
             {
                 "text": "Enter Archie's Room (First Left)",
@@ -106,12 +106,12 @@
             {
                 "text": "Enter the second door on the right which is slightly open",
                 "action": { "type": "next", "target": "2C" },
-                "when": [{ "type": "game_state", "key": "entered-bathroom", "value": "0" }]
+                "when": [{ "key": "entered:2C", "value": false }]
             },
             {
                 "text": "Enter the bathroom (Second Right)",
                 "action": { "type": "next", "target": "2C" },
-                "when": [{ "type": "game_state", "key": "entered-bathroom", "value": "1" }]
+                "when": [{ "key": "entered:2C", "value": true }]
             },
             {
                 "text": "Walk to the end of the corridor",
@@ -125,11 +125,11 @@
     },
     {
         "key": "D2",
-        "text": "As you walk down the stairs the floor below creaks you pause for a moment until you hear a loud roar.You begin to run as fast as you can straight to the front door but it's locked.",
+        "text": "As you walk down the stairs the floor below creaks you pause for a moment until you hear a loud roar.\nYou begin to run as fast as you can straight to the front door but it's locked.",
         "onEnter": [
-            { "type": "audio", "key": "floor-creek", "options": { "volume": 0.6, "loop": false, "delay": 2000 } },
-            { "type": "audio", "key": "monster-roar", "options": { "volume": 1, "loop": false, "delay": 3000 } },
-            { "type": "audio", "key": "monster-coming", "options": { "volume": 0.8, "loop": true, "delay": 5000 } }
+            { "type": "audio", "key": "floor_creek", "options": { "volume": 0.6, "loop": false, "delay": 2000 } },
+            { "type": "audio", "key": "monster_roar", "options": { "volume": 1, "loop": false, "delay": 3000 } },
+            { "type": "audio", "key": "monster_coming", "options": { "volume": 0.8, "loop": true, "delay": 5000 } }
         ],
         "choices": [
             {
@@ -155,8 +155,8 @@
         "text": "You walk into the room with the girl crying, as you do the crying stops and you notice a little girl sad in the middle of the room staring at you with tears falling down her face.",
         "returnText": "CUSTOM",
         "customReturnText": [
-            { "when": { "type": "game_state", "key": "girl-crying", "value": "1" }, "text": "You walk into the room with the girl crying, as you do the crying stops and you notice a little girl sad in the middle of the room staring at you with tears falling down her face." },
-            { "when": { "type": "game_state", "key": "girl-crying", "value": "0" }, "text": "You walk into the room, you see the Lily spinning round smiling with her arms streched out and her pink Oh in hand." }
+            { "when": [{ "key": "girl-crying", "value": true }], "text": "You walk into the room with the girl crying, as you do the crying stops and you notice a little girl sad in the middle of the room staring at you with tears falling down her face." },
+            { "when": [{ "key": "girl-crying", "value": false }], "text": "You walk into the room, you see the Lily spinning round smiling with her arms streched out and her pink Oh in hand." }
         ],
         "choices": [
             {
@@ -171,7 +171,7 @@
                 "text": "Leave Room",
                 "action": { "type": "next", "target": "2" },
                 "onAction": [
-                    { "when": { "type": "game_state", "key": "girl-crying", "value": "1" }, "type": "leave_text", "options": { "text": "As soon as you open the door the leave the room the girl starts crying again." } }
+                    { "when": { "key": "girl-crying", "value": true }, "type": "leave_text", "options": { "text": "As soon as you open the door the leave the room the girl starts crying again." } }
                 ]
             }
         ]
@@ -184,12 +184,12 @@
             {
                 "text": "\"What is Oh?\"",
                 "action": { "type": "next", "target": "2A1-1" },
-                "when": [{ "type": "conversation", "key": "lily-1", "value": "0" }]
+                "when": [{ "type": "conversation", "key": "lily-1", "value": false }]
             },
             {
                 "text": "\"Where is Oh?\"",
                 "action": { "type": "next", "target": "2A1-2" },
-                "when": [{ "type": "conversation", "key": "lily-2", "value": "0" }]
+                "when": [{ "type": "conversation", "key": "lily-2", "value": false }]
             },
             {
                 "text": "Give Oh to Lily",
@@ -197,7 +197,7 @@
                 "onAction": [
                     { "type": "use_item", "key": "wrongOh" }
                 ],
-                "when": [{ "type": "item", "key": "wrongOh", "value": "1" }]
+                "when": [{ "type": "item", "key": "wrongOh", "value": 1 }]
             },
             {
                 "text": "Give Pink Oh to Lily",
@@ -205,7 +205,7 @@
                 "onAction": [
                     { "type": "use_item", "key": "pinkOh" }
                 ],
-                "when": [{ "type": "item", "key": "pinkOh", "value": "1" }]
+                "when": [{ "type": "item", "key": "pinkOh", "value": 1 }]
             },
             {
                 "text": "Stop talking to Lily",
@@ -217,7 +217,7 @@
         "key": "2A1-1",
         "text": "She replies \"Oh! I want my Oh!\"",
         "onEnter": [
-            { "type": "conversation", "key": "lily-1", "value": "1" }
+            { "type": "conversation", "key": "lily-1", "value": true }
         ],
         "next": "2A1"
     },
@@ -225,7 +225,7 @@
         "key": "2A1-2",
         "text": "She replies \"Archie!, Archie took Oh!\"",
         "onEnter": [
-            { "type": "conversation", "key": "lily-2", "value": "1" }
+            { "type": "conversation", "key": "lily-2", "value": true }
         ],
         "next": "2A1"
     },
@@ -238,7 +238,7 @@
         "key": "2A1-4",
         "text": "As soon as you pull out the pink Oh to hand the the girl her hands strech out towards you and with a huge smile she starts squeeling with happyness.",
         "onEnter": [
-            { "type": "game_state", "key": "girl-crying", "value": "0" }
+            { "type": "game_state", "key": "girl-crying", "value": false }
         ],
         "next": "2A"
     },
@@ -247,19 +247,19 @@
         "text": "You start to look around the room.",
         "onEnter": [
             { 
-                "when": [{ "type": "rolled", "key": "2A2", "value": "0" }], 
+                "when": [{ "type": "rolled", "key": "2A2", "value": false }], 
                 "type": "roll", 
                 "key": "2A2", 
                 "options": {
-                    "numberOfDice": "1",
+                    "numberOfDice": 1,
                     "action": [
-                        { "min": "1", "max": "3", "type": "next", "target": "2A2-R1" },
-                        { "min": "4", "max": "5", "type": "next", "target": "2A2-R2" },
-                        { "min": "6", "max": "6", "type": "next", "target": "2A2-R3" }
+                        { "min": 1, "max": 3, "type": "next", "target": "2A2-R1" },
+                        { "min": 4, "max": 5, "type": "next", "target": "2A2-R2" },
+                        { "min": 6, "max": 6, "type": "next", "target": "2A2-R3" }
                     ]
                 } 
             },
-            { "when": [{ "type": "rolled", "key": "2A2", "value": ">0" }], "type": "rolled-value", "key": "2A2" }
+            { "when": [{ "type": "rolled", "key": "2A2", "value": true }], "type": "rolled-value", "key": "2A2" }
         ]
     },
     {
