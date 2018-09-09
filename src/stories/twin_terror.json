@@ -32,10 +32,10 @@
     },
     {
         "key": "1",
-        "text": "As you enter the house the door slams shut behind you and you hear the sound of children playing and laughing, It seems to be coming from upstairs.\n\nAfter a short while, the laughing stops and you hear a cry to the point of screaming from a girl.\n\nAs you look around the room you entered you notice the stairs directly in front of you as well as two doors, One to the left and one right.",
-        "returnText": "",
+        "text": "As you enter the house you hear the sound of children playing and laughing, It seems to be coming from upstairs.\n\nAfter a short while, the laughing stops and you hear a cry to the point of screaming from a girl.\n\nAs you look around the room you entered you notice the stairs directly in front of you as well as two doors, One to the left and one right.",
+        "returnText": "You enter the ground floor at the bottom of the stairs. There are 3 doors, one left one right and the main front door.",
         "onEnter": [
-            { "when": [{ "key": "entered:1", "value": true }], "type": "game_state", "key": "girl-crying", "value": true },
+            { "when": [{ "key": "entered:1", "value": true }], "type": "variable", "key": "girl-crying", "value": true },
             { "when": [{ "key": "entered:1", "value": true }], "type": "audio", "key": "kids_opening", "options": { "volume": 0.05, "loop": false } }
         ],
         "choices": [
@@ -65,7 +65,7 @@
     },
     {
         "ket": "D1",
-        "text": "As you turn to leave the house you hear a large thumping, faster and faster.\n\nYou dare not turn around to look so you just swin the door open and start running.",
+        "text": "As you turn to leave the house you hear a large thumping, faster and faster.\n\nYou dare not turn around to look so you swing the door open and just start running.",
         "onEnter": [
             { "type": "audio", "key": "monster_roar", "options": { "volume": 0.3, "loop": false } },
             { "type": "audio", "key": "monster_coming", "options": { "volume": 0.2, "loop": false, "delay": 1000 } },
@@ -86,7 +86,7 @@
         "text": "You walk upstairs towards the crying, it's getting darker as you walk upstairs.\n\nOnce you reach the top you notice a long corridor in front of you, you can't see the end as it's completely black in darkness.\n\nLooking down the hallway you can see 3 doors, the first door to the left has a sign on it saying Archie's room there is a light you notice in the crack under the door.  Down the right side the first door has a sign saying Lily's room there is also light from under the door and also you can hear the crying girl inside. The last door you see on the right has no light but you notice the door slightly open.",
         "returnText": "You reenter the hallway, standing at the top of the stairs you look back down the hallway.",
         "onEnter": [
-            { "when": [{ "key": "girl-crying", "value": true }], "type": "audio", "key": "girl-crying", "options": { "volume": 0.5, "loop": true } }
+            { "when": [{ "key": "girl-crying", "value": true }], "type": "audio", "key": "girl_crying", "options": { "volume": 0.3, "loop": true } }
         ],
         "choices": [
             {
@@ -215,7 +215,7 @@
     },
     {
         "key": "2A1-1",
-        "text": "She replies \"Oh! I want my Oh!\"",
+        "text": "\"Oh! I want my Oh!\"",
         "onEnter": [
             { "type": "conversation", "key": "lily-1", "value": true }
         ],
@@ -223,7 +223,7 @@
     },
     {
         "key": "2A1-2",
-        "text": "She replies \"Archie!, Archie took Oh!\"",
+        "text": "\"Archie!, Archie took Oh!\"",
         "onEnter": [
             { "type": "conversation", "key": "lily-2", "value": true }
         ],
@@ -231,14 +231,15 @@
     },
     {
         "key": "2A1-3",
-        "text": "You hand Lily the Oh toy and she throws it to the side and says evilly \"LILY DON'T WANT THAT OH! LILY WANTS' PINK OH!\"",
+        "text": "You hand Lily the Oh toy and she throws it to the side and says \"LILY DON'T WANT THAT OH! LILY WANTS' PINK OH!\"",
         "next": "2A1"
     },
     {
         "key": "2A1-4",
         "text": "As soon as you pull out the pink Oh to hand the the girl her hands strech out towards you and with a huge smile she starts squeeling with happyness.",
         "onEnter": [
-            { "type": "game_state", "key": "girl-crying", "value": false }
+            { "type": "variable", "key": "girl-crying", "value": false },
+            { "type": "audio", "key": "girl_happy", "options": { "volume": 0.7, "loop": false, "delay": 1000 } }
         ],
         "next": "2A"
     },
@@ -322,6 +323,30 @@
             { 
                 "text": "Look under bed",
                 "action": { "type": "next", "target": "2A2-R-D" }
+            }
+        ]
+    },
+    {
+        "key": "2A2-R-A",
+        "text": "In the box, you see lots of pink things, a crown, a princess dress and lots and lots of unicorns, a red sports car.",
+        "choices": [
+            {
+                "text": "Take the crown",
+                "action": { "type": "next", "target": "2A2-R-A-1" }
+            },
+            {
+                "text": "Take the dress",
+                "action": { "type": "next", "target": "2A2-R-A-2" }
+            },
+            {
+                "text": "Take a unicorn",
+                "action": { "type": "next", "target": "2A2-R-A-3" }
+            },
+            {
+                "take": "Take car",
+                "action": { "type": "item", "target": "car" },
+                "onAction": [{ "type": "variable", "key": "took-car", "value": true }],
+                "when": [{ "key": "took-car", "value": false }]
             }
         ]
     }

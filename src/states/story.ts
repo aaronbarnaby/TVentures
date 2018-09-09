@@ -84,6 +84,10 @@ export default class StoryState extends Phaser.State {
     
     iconSave() {
         this.storyManager.stopAudio();
+
+        // Remove Current room entered status before save.
+        Globals.save.updateStoryVariable(`entered:${Globals.save.currentNodeKey}`, false);
+
         Globals.saveManager.saveGame(true);
     }
     

@@ -41,7 +41,7 @@ You walk upstairs towards the crying, it's getting darker as you walk upstairs.\
 
 [D2]
 [DELAY, 2sec][AUDIO floor-creak, SINGLE][DELAY, 1sec][AUDIO monster-roar, SINGLE][DELAY 2sec][AUDIO monster-coming, SINGLE]
-As you walk down the stairs the floor below creaks you pause for a moment until you hear a loud roar.You begin to run as fast as you can straight to the front door but it's locked.
+As you walk down the stairs the floor below creaks you pause for a moment until you hear a loud roar. You begin to run as fast as you can straight to the front door but it's locked.
 
 - Kick Door Open [D0]
 - Find Another Exit [D0A]
@@ -80,12 +80,12 @@ She replies "Archie!, Archie took Oh!"
 - Stop talking to girl [2A]
 
 [2A1-3]
-You hand lily the (wrongOh color) Oh and she throws it to the side and says "LILY DON'T WANT (color) Oh! LILY WANTS' PINK OH!)
+You hand lily the Oh and she throws it to the side and says "LILY DON'T WANT (colour) Oh! LILY WANTS' PINK OH!)
 
 - Stop talking to girl [2A]
 
 [2A1-4]
-As soon as you pull out the pink oh to hand the the girl her hands strech out towards you and with a huge smile she starts squeeling with happyness.
+As soon as you pull out the pink oh to hand the girl her hands stretch out towards you and with a huge smile she starts squealing with happiness.
 
 - Stop talking to girl [2A]
 
@@ -97,26 +97,26 @@ You start to look around the room.\n\n\n\n(roll dice to indicate your searching 
 [2A2-R1]
 You have always been bad at finding stuff, however you take a look around and see a toybox on the floor and a shelf with some cuddly toys on.
 
-- Look in box [2A2-R-A]
-- Check toys on shelf [2A2-R-B]
+- Look in the box [2A2-R-A]
+- Check toys on the shelf [2A2-R-B]
 
 [2A2-R2]
-You feel that your ok at finding stuff, you look around noticing a toybox on the floor and a shelf with cuddly toys.\nYou also notice a picture next to the girls' bed.
+You feel that you're ok at finding stuff, you look around noticing a toybox on the floor and a shelf with cuddly toys.\nYou also notice a picture next to the girls' bed.
 
-- Look in box [2A2-R-A]
-- Check toys on shelf [2A2-R-B]
-- Look at picture [2A2-R-C]
+- Look in the box [2A2-R-A]
+- Check toys on the shelf [2A2-R-B]
+- Look at the picture [2A2-R-C]
 
 [2A2-R3]
-Your great at finding stuff, you look carefully around the room spotting a toybox on the floor, a shelf with cuddly toys, a pictures next to the girl's bed and also something that seems to be under the bed.
+You're great at finding stuff, you look carefully around the room spotting a toybox on the floor, a shelf with cuddly toys, a picture next to the girl's bed and also something that seems to be under the bed.
 
-- Look in box [2A2-R-A]
-- Check toys on shelf [2A2-R-B]
-- Look at picture [2A2-R-C]
+- Look in the box [2A2-R-A]
+- Check toys on the shelf [2A2-R-B]
+- Look at the picture [2A2-R-C]
 - Look under bed [2A2-R-D]
 
 [2A2-R-A]
-In the box you see lots of pink things, a crown, a princess dress and lots and lots of unicorns, a red sports car.
+In the box, you see lots of pink things, a crown, a princess dress and lots and lots of unicorns, a red sports car.
 
 - Take the crown [2A2-R-A-1]
 - Take the dress [2A2-R-A-2]
@@ -127,7 +127,7 @@ In the box you see lots of pink things, a crown, a princess dress and lots and l
 [2A2-R-A-1]
 As you take the crown the little girl stares at you with a really serious face and says "NO THAT LILY CROWN, DON'T TAKE LILY'S CROWN".
 
-- Put crown back [2A2-R-A]
+- Put the crown back [2A2-R-A]
 - Take crown [DL1]
 
 [2A2-R-A-2]
@@ -155,17 +155,17 @@ As you open the door to exit the room you see a huge dark figure standing in the
 - Return To Menu [>Menu]
 
 [DL1-2]
-You crawl under the bed which is a tight squese, once under you hear the door slam open.\nYou attempt you peek at what opened the door but as you do you feel something grab your feet and pull you out.\n\nAs your pulled out from under the bed you see the girl still sat smiling now and also pointing under the bed.\n\nThe figure picks you up by your head and with one clean swipe cuts your head straight off.\n\n\n\nGAME OVER
+You crawl under the bed which is a tight squeeze, once under you hear the door slam open.\nYou attempt you peek at what opened the door but as you do you feel something grab your feet and pull you out.\n\nAs you're pulled out from under the bed you see the girl still sat smiling now and also pointing under the bed.\n\nThe figure picks you up by your head and with one clean swipe cuts your head straight off.\n\n\n\nGAME OVER
 
 - Start Again [0]
 - Return To Menu [>Menu]
 
 [2A2-R-B]
-You look up at the shelf looking at the range of cuddly toys on display.\nThere are 3 types of toys that you see, a white owl, a range of colorful alien looking characters and one that you reconise...peppa pig.
+You look up at the shelf looking at the range of cuddly toys on display.\nThere are 3 types of toys that you see, a white owl, a range of colourful alien looking characters and one that you recognize...Peppa Pig.
 
 - Look at owl [2A2-R-B-1]
 - Look at aliens' [2A2-R-B-2] (IF ITEMS != wrongOh)
-- Look at peppa pig [2A2-R-B-3]
+- Look at Peppa pig [2A2-R-B-3]
 - Back to Room [RETURN]
 
 [2A2-R-B-1]
@@ -174,14 +174,14 @@ You pick up the owl and take a closer look. White with black strips it looks alm
 - Continue [2A2-R-B]
 
 [2A2-R-B-2]
-Looking at the aliens you see one red, one purple and one yellow. Upon further examination you notice a label on the aliens, "Dreamworks HOME Oh".
+Looking at the aliens you see one red, one purple and one yellow. Upon further examination, you notice a label on the aliens, "Dreamworks HOME Oh".
 
 - Take red alien [>TAKE wrongOh][2A2-R-B]
 - Take purple alien [>TAKE wrongOh][2A2-R-B]
 - Take yellow alien [>TAKE wrongOh][2A2-R-B]
 
 [2A2-R-B-3]
-You pickup peppa pig and take a closer look. Wearing a crown and holding a wand it seems to be a princess version of peppa pig.
+You pick up Peppa pig and take a closer look. Wearing a crown and holding a wand it seems to be a princess version of Peppa Pig.
 
 - Continue [2A2-R-B]
 

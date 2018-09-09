@@ -11,7 +11,8 @@ export default class SaveManager {
     loadGame() {
         let storage = localStorage.getItem("tventures-save");
         if (storage) {
-            let saveData = JSON.parse(storage)
+            let saveData = JSON.parse(storage);
+            //console.log("LOAD: ", saveData);
             Globals.save = new SaveGame();
             Globals.save.reload(saveData);
 
@@ -28,7 +29,9 @@ export default class SaveManager {
     }
 
     saveGame(returnToMenu: boolean) {
-        localStorage.setItem("tventures-save", JSON.stringify(Globals.save.exportData()));
+        let saveData = Globals.save.exportData();
+        //console.log("SAVE: ", saveData);
+        localStorage.setItem("tventures-save", JSON.stringify(saveData));
 
         if (returnToMenu) {
             // Return to Menu

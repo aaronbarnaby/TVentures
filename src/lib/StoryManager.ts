@@ -81,7 +81,9 @@ export default class StoryManager {
         if (choiceData.onAction) {
             _.forEach(choiceData.onAction, (a) => {
                 if (this.checkWhen(a.when)) {
-                    if (a.type === 'use_item') {
+                    if (a.type === 'variable') {
+                        Globals.save.updateStoryVariable(a.key, a.value);
+                    } else if (a.type === 'use_item') {
                         let itemCount = Globals.save.currentItems[a.key];
                         let newCount = itemCount - ((a.value as number) || 1);
 
@@ -112,7 +114,12 @@ export default class StoryManager {
         }
         
         if (continueAction) {
-            if (choiceData.action.type === 'next') {
+            if (choiceData.action.type === 'item') {
+                Globals.save.addItems(choiceData.action.target, 1);
+                
+                // Reload Node
+                this.loadStoryNode(Globals.save.currentNodeKey);
+            } else if (choiceData.action.type === 'next') {
                 this.loadStoryNode(choiceData.action.target);
             } else if (choiceData.action.type === 'state') {
                 this.game.state.start(choiceData.action.target);
@@ -181,14 +188,14 @@ export default class StoryManager {
                                 });
                             };
                             this.displayModal(`dice_${diceOptions.numberOfDice}`);
-                        } else if (x.type === 'game_state') {
+                        } else if (x.type === 'variable') {
                             Globals.save.updateStoryVariable(x.key, x.value);
                         } else if (x.type === 'conversation') {
                             Globals.save.updateStoryVariable(`conversation:${x.key}`, x.value);
                         } else if (x.type === 'audio') {
                             if (this.game.cache.checkSoundKey(x.key)) {
                                 let audioOption: IAudioOption = x.options as IAudioOption;
-                                let audioClip = this.game.add.audio(x.key, (audioOption.volume || 1), (audioOption.loop || false));
+                                let audioClip = this.game.add.audio(x.key, (audioOption.volume * 0.5 || 0.5), (audioOption.loop || false));
                                 
                                 if (Globals.hasSound) {
                                     if (audioOption.delay) {

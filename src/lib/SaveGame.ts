@@ -50,22 +50,48 @@ export default class SaveGame {
     }
 
     getStoryVariable(key) {
-        if (this.storyVariables[key]) {
-            return this.storyVariables[key];
-        }
-        return null;
+        let ref = _.find(this.storyVariables, o => o.key === key);
+        return (ref) ? ref.value : null;
     }
 
     updateStoryVariable(key, value) {
-        this.storyVariables[key] = value;
+        let ref = _.find(this.storyVariables, o => o.key === key);
+        if (ref) {
+            ref.value = value;
+        } else {
+            this.storyVariables.push({ key, value });
+        }
     }
 
     checkStoryVariable(key, value) {
-        if (this.storyVariables[key] || value === false) {
-            if (this.storyVariables[key] === value) {
-                return true;
-            }
+        let ref = _.find(this.storyVariables, o => o.key === key);
+        if (!ref && value === false) { return true; }
+        if (ref) {
+            if (ref.value === value) { return true; }
         }
         return false;
+    }
+
+    addItems(key, amt) {
+        let item = _.find(this.currentItems, o => o.key === key);
+        if (item) {
+            item.count += amt;
+        } else {
+            this.currentItems.push({ key, count: amt });
+        }
+    }
+
+    removeItems(key, amt) {
+        let item = _.find(this.currentItems, o => o.key === key);
+        if (item) {
+            item.count -= amt;
+        }
+    }
+
+    checkItems(key, amt) {
+        let item = _.find(this.currentItems, o => o.key === key);
+        if (!item || amt === 0) { return false; }
+
+        return (item.count >= amt);
     }
 }

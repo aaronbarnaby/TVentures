@@ -32,7 +32,11 @@ export let STORYBOOKS = [
       { type: "audio", path: "./assets/sounds/monster-coming.mp3", target: "monster_coming" },
       { type: "audio", path: "./assets/sounds/outside-running.mp3", target: "outside_running" },
       { type: "audio", path: "./assets/sounds/monster-growl.mp3", target: "monster_growl" },
-      { type: "audio", path: "./assets/sounds/monster-roar.mp3", target: "monster_roar" }
+      { type: "audio", path: "./assets/sounds/monster-roar.mp3", target: "monster_roar" },
+      { type: "audio", path: "./assets/sounds/girl-cry.mp3", target: "girl_crying" },
+      { type: "audio", path: "./assets/sounds/boy-car.mp3", target: "boy_car" },
+      { type: "audio", path: "./assets/sounds/floor-creak.wav", target: "floor_creak" },
+      { type: "audio", path: "./assets/sounds/girl-happy.mp3", target: "girl_happy" }
     ]
   }
 ];
